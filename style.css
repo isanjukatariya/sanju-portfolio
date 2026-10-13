@@ -686,7 +686,7 @@ body, a, img, h3, p, span, button {
   .left-column, .right-column {
     gap: 32px !important;
   }
-  .card-image, .workmate-image, .velo-image {
+  .card-image, .workmate-image, .velo-image .image-frame{
     width: 100% !important;
     height: auto !important;
     aspect-ratio: 4/3 !important;
