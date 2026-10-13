@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Sanju Portfolio</title>
+    <link rel="icon" type="image/png" href="images/favicon.png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    
+    <div class="custom-cursor">
+        <div class="cursor-shape">
+            <span class="cursor-text-content"></span>
+        </div>
+    </div>
+
+    <script>
+        let cursor = document.querySelector('.custom-cursor');
+        let mouseX = 0, mouseY = 0, cursorX = 0, cursorY = 0;
+        let isMouseActive = false; 
+        let hasStartedMoving = false; 
+
+        const savedX = sessionStorage.getItem('cursorX');
+        const savedY = sessionStorage.getItem('cursorY');
+        
+        if (savedX !== null && savedY !== null) {
+            mouseX = parseFloat(savedX);
+            mouseY = parseFloat(savedY);
+            cursorX = mouseX;
+            cursorY = mouseY;
+            hasStartedMoving = true;
+            isMouseActive = true;
+            if (cursor) cursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0)`;
+        }
+
+        function getHomePosition() {
+            const homeSquare = document.querySelector('.orange-square');
+            if (homeSquare) {
+                const rect = homeSquare.getBoundingClientRect();
+                return { x: rect.left + (rect.width / 2), y: rect.top + (rect.height / 2) };
+            }
+            return { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+        }
+
+        function updateNameColor(isDetached) {
+            const nameText = document.querySelector('.name');
+            if (nameText) {
+                if (isDetached) nameText.classList.add('brand-active');
+                else nameText.classList.remove('brand-active');
+            }
+        }
+
+        function lockCursorToHome() {
+            if (hasStartedMoving) return;
+            const homePos = getHomePosition();
+            cursorX = homePos.x;
+            cursorY = homePos.y;
+            if (cursor) cursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0)`;
+            updateNameColor(false); 
+        }
+        
+        if (!hasStartedMoving) {
+            lockCursorToHome();
+            setTimeout(lockCursorToHome, 100);
+        }
+
+        document.addEventListener('mousemove', (e) => {
+            hasStartedMoving = true; 
+            isMouseActive = true;
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            updateNameColor(true); 
+            
+            sessionStorage.setItem('cursorX', mouseX);
+            sessionStorage.setItem('cursorY', mouseY);
+        });
+
+        document.addEventListener('mouseleave', (e) => {
+            if (e.clientY <= 0 || e.clientX <= 0 || (e.clientX >= window.innerWidth || e.clientY >= window.innerHeight)) {
+                isMouseActive = false; 
+                updateNameColor(false); 
+            }
+        });
+        
+        document.addEventListener('mouseenter', () => {
+            isMouseActive = true;
+            updateNameColor(true); 
+        });
+
+        document.addEventListener('mousedown', () => {
+            if (cursor) cursor.classList.add('cursor-click');
+        });
+
+        document.addEventListener('mouseup', () => {
+            if (cursor) cursor.classList.remove('cursor-click');
+        });
+        
+        let hoverTimer;
+        let activeMsgTarget = null;
+
+        document.addEventListener('mouseover', (e) => {
+            if (!cursor || !isMouseActive) return; 
+            const target = e.target;
+            
+            const isLink = target.closest('a');
+            const isText = target.matches('h1, h2, h3, p, span, .date, .cs-title, .roles, .name'); 
+
+            if (!cursor.classList.contains('cursor-chat')) {
+                cursor.classList.remove('cursor-text', 'cursor-link');
+                void cursor.offsetWidth; 
+                if (isLink) cursor.classList.add('cursor-link');
+                else if (isText) cursor.classList.add('cursor-text');
+            }
+
+            const msgTarget = target.closest('[data-message]');
+            
+            if (msgTarget && msgTarget !== activeMsgTarget) {
+                activeMsgTarget = msgTarget;
+                clearTimeout(hoverTimer);
+                
+                hoverTimer = setTimeout(() => {
+                    const msg = msgTarget.getAttribute('data-message');
+                    const textSpan = cursor.querySelector('.cursor-text-content');
+                    const shape = cursor.querySelector('.cursor-shape');
+
+                    if (textSpan && shape) {
+                        cursor.classList.remove('cursor-text', 'cursor-link');
+                        cursor.classList.add('cursor-chat');
+                        textSpan.textContent = msg;
+                        
+                        const targetWidth = textSpan.offsetWidth + 32; 
+                        shape.style.width = `${targetWidth}px`;
+                        shape.style.height = `32px`;
+                        
+                        setTimeout(() => { textSpan.style.opacity = '1'; }, 100);
+                    }
+                }, 2000); 
+            }
+        });
+
+        document.addEventListener('mouseout', (e) => {
+            if (activeMsgTarget) {
+                if (!e.relatedTarget || !activeMsgTarget.contains(e.relatedTarget)) {
+                    clearTimeout(hoverTimer);
+                    activeMsgTarget = null;
+                    
+                    const textSpan = cursor.querySelector('.cursor-text-content');
+                    const shape = cursor.querySelector('.cursor-shape');
+
+                    if (textSpan && shape && cursor.classList.contains('cursor-chat')) {
+                        textSpan.style.opacity = '0';
+                        cursor.classList.remove('cursor-chat');
+                        
+                        shape.style.width = '';
+                        shape.style.height = '';
+
+                        setTimeout(() => { 
+                            if(!cursor.classList.contains('cursor-chat')) textSpan.style.display = 'none'; 
+                        }, 300);
+                    }
+                }
+            }
+        });
+
+        function animate() {
+            if (cursor) {
+                let targetX = mouseX;
+                let targetY = mouseY;
+
+                if (!hasStartedMoving || !isMouseActive) {
+                    const homePos = getHomePosition();
+                    targetX = homePos.x;
+                    targetY = homePos.y;
+                    
+                    if (cursor.classList.contains('cursor-chat')) {
+                        const textSpan = cursor.querySelector('.cursor-text-content');
+                        if(textSpan) textSpan.style.opacity = '0';
+                    }
+                    cursor.classList.remove('cursor-text', 'cursor-link', 'cursor-chat');
+                }
+
+                cursorX += (targetX - cursorX) * 0.4;
+                cursorY += (targetY - cursorY) * 0.4;
+                
+                cursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0)`;
+            }
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        document.addEventListener('click', async (e) => {
+            const link = e.target.closest('a');
+            if (!link || link.hostname !== window.location.hostname || link.target === '_blank' || link.href.includes('#')) return;
+            e.preventDefault();
+            
+            sessionStorage.setItem('cursorX', mouseX);
+            sessionStorage.setItem('cursorY', mouseY);
+            
+            const destination = link.href;
+
+            try {
+                const response = await fetch(destination);
+                const htmlText = await response.text();
+                const parser = new DOMParser();
+                const newDoc = parser.parseFromString(htmlText, 'text/html');
+
+                const updateDOM = () => {
+                    document.title = newDoc.title;
+                    document.body.innerHTML = newDoc.body.innerHTML;
+                    window.history.pushState({}, '', destination);
+                    window.scrollTo(0, 0);
+                    
+                    cursor = document.querySelector('.custom-cursor');
+                    if (cursor) {
+                        cursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0)`;
+                    }
+                    updateNameColor(true); 
+                };
+
+                if (document.startViewTransition) document.startViewTransition(updateDOM);
+                else updateDOM(); 
+            } catch (err) { window.location.href = destination; }
+        });
+
+        window.addEventListener('popstate', () => window.location.reload());
+    </script>
+
+    <main class="main-frame" style="min-height: 100vh; justify-content: center; align-items: center; text-align: center;"> 
+        
+        <header class="heading" style="align-items: center; justify-content: center; text-align: center; height: auto;" data-message="Lost in the Grand Line?">
+            <h1 style="font-size: clamp(80px, 15vw, 160px); color: var(--text-third); margin-bottom: 16px; letter-spacing: -2px;">404</h1>
+            <h2 style="font-size: 20px; color: var(--text-primary); margin-bottom: 8px;">Looks like you wandered off the canvas.</h2>
+            <h2 style="color: var(--text-secondary);">This page is either missing, deleted, or out getting coffee.</h2>
+            
+            <a href="index.html" class="back-link" style="margin-top: 40px; margin-bottom: 0 !important;">
+                <svg class="back-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                <span class="dark-text">Return to familiar territory</span>
+            </a>
+        </header>
+
+    </main>
+
+</body>
+</html>

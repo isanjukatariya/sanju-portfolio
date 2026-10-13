@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Summit'26 | Sanju Singh</title>
+    <link rel="icon" type="image/png" href="images/favicon.png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="custom-cursor">
+        <div class="cursor-shape">
+            <span class="cursor-text-content"></span>
+        </div>
+    </div>
+
+    <script>
+
+  let cursor = document.querySelector('.custom-cursor');
+  let mouseX = 0, mouseY = 0, cursorX = 0, cursorY = 0;
+  let isMouseActive = false; 
+  let hasStartedMoving = false; 
+
+  const savedX = sessionStorage.getItem('cursorX');
+  const savedY = sessionStorage.getItem('cursorY');
+  
+  if (savedX !== null && savedY !== null) {
+    mouseX = parseFloat(savedX);
+    mouseY = parseFloat(savedY);
+    cursorX = mouseX;
+    cursorY = mouseY;
+    hasStartedMoving = true;
+    isMouseActive = true;
+    if (cursor) cursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0)`;
+  }
+
+  function getHomePosition() {
+    const homeSquare = document.querySelector('.orange-square');
+    if (homeSquare) {
+      const rect = homeSquare.getBoundingClientRect();
+      return { x: rect.left + (rect.width / 2), y: rect.top + (rect.height / 2) };
+    }
+    return { x: 0, y: 0 };
+  }
+
+  function updateNameColor(isDetached) {
+    const nameText = document.querySelector('.name');
+    if (nameText) {
+      if (isDetached) nameText.classList.add('brand-active');
+      else nameText.classList.remove('brand-active');
+    }
+  }
+
+  function lockCursorToHome() {
+    if (hasStartedMoving) return; 
+    const homePos = getHomePosition();
+    cursorX = homePos.x;
+    cursorY = homePos.y;
+    if (cursor) cursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0)`;
+    updateNameColor(false); 
+  }
+  
+  if (!hasStartedMoving) {
+    lockCursorToHome();
+    setTimeout(lockCursorToHome, 100);
+  }
+
+  document.addEventListener('mousemove', (e) => {
+    hasStartedMoving = true; 
+    isMouseActive = true;
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    updateNameColor(true); 
+    
+    sessionStorage.setItem('cursorX', mouseX);
+    sessionStorage.setItem('cursorY', mouseY);
+  });
+
+  document.addEventListener('mouseleave', (e) => {
+    if (e.clientY <= 0 || e.clientX <= 0 || (e.clientX >= window.innerWidth || e.clientY >= window.innerHeight)) {
+      isMouseActive = false; 
+      updateNameColor(false); 
+    }
+  });
+  
+  document.addEventListener('mouseenter', () => {
+    isMouseActive = true;
+    updateNameColor(true); 
+  });
+
+  document.addEventListener('mousedown', () => {
+    if (cursor) cursor.classList.add('cursor-click');
+  });
+
+  document.addEventListener('mouseup', () => {
+    if (cursor) cursor.classList.remove('cursor-click');
+  });
+  
+
+  let hoverTimer;
+  let activeMsgTarget = null;
+
+  document.addEventListener('mouseover', (e) => {
+    if (!cursor || !isMouseActive) return; 
+    const target = e.target;
+    
+    const isLink = target.closest('a');
+    const isText = target.matches('h1, h2, h3, p, span, .date, .cs-title, .roles, .name'); 
+
+    if (!cursor.classList.contains('cursor-chat')) {
+      cursor.classList.remove('cursor-text', 'cursor-link');
+      void cursor.offsetWidth; 
+      if (isLink) cursor.classList.add('cursor-link');
+      else if (isText) cursor.classList.add('cursor-text');
+    }
+
+    const msgTarget = target.closest('[data-message]');
+    
+    if (msgTarget && msgTarget !== activeMsgTarget) {
+      activeMsgTarget = msgTarget;
+      clearTimeout(hoverTimer);
+      
+      hoverTimer = setTimeout(() => {
+        const msg = msgTarget.getAttribute('data-message');
+        const textSpan = cursor.querySelector('.cursor-text-content');
+        const shape = cursor.querySelector('.cursor-shape');
+
+        if (textSpan && shape) {
+          cursor.classList.remove('cursor-text', 'cursor-link');
+          cursor.classList.add('cursor-chat');
+          textSpan.textContent = msg;
+          
+          const targetWidth = textSpan.offsetWidth + 32; 
+          shape.style.width = `${targetWidth}px`;
+          shape.style.height = `32px`;
+          
+          setTimeout(() => { textSpan.style.opacity = '1'; }, 100);
+        }
+      }, 2000); 
+    }
+  });
+
+  document.addEventListener('mouseout', (e) => {
+    if (activeMsgTarget) {
+      if (!e.relatedTarget || !activeMsgTarget.contains(e.relatedTarget)) {
+        clearTimeout(hoverTimer);
+        activeMsgTarget = null;
+        
+        const textSpan = cursor.querySelector('.cursor-text-content');
+        const shape = cursor.querySelector('.cursor-shape');
+
+        if (textSpan && shape && cursor.classList.contains('cursor-chat')) {
+          textSpan.style.opacity = '0';
+          cursor.classList.remove('cursor-chat');
+          
+          shape.style.width = '';
+          shape.style.height = '';
+
+          setTimeout(() => { 
+            if(!cursor.classList.contains('cursor-chat')) textSpan.style.display = 'none'; 
+          }, 300);
+        }
+      }
+    }
+  });
+
+  function animate() {
+    if (cursor) {
+      let targetX = mouseX;
+      let targetY = mouseY;
+
+      if (!hasStartedMoving || !isMouseActive) {
+        const homePos = getHomePosition();
+        targetX = homePos.x;
+        targetY = homePos.y;
+        
+        if (cursor.classList.contains('cursor-chat')) {
+            const textSpan = cursor.querySelector('.cursor-text-content');
+            if(textSpan) textSpan.style.opacity = '0';
+        }
+        cursor.classList.remove('cursor-text', 'cursor-link', 'cursor-chat');
+      }
+
+      cursorX += (targetX - cursorX) * 0.4;
+      cursorY += (targetY - cursorY) * 0.4;
+      
+      cursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0)`;
+    }
+    requestAnimationFrame(animate);
+  }
+  animate();
+
+  document.addEventListener('click', async (e) => {
+    const link = e.target.closest('a');
+    if (!link || link.hostname !== window.location.hostname || link.target === '_blank' || link.href.includes('#')) return;
+    e.preventDefault();
+    
+    sessionStorage.setItem('cursorX', mouseX);
+    sessionStorage.setItem('cursorY', mouseY);
+    
+    const destination = link.href;
+
+    try {
+      const response = await fetch(destination);
+      const htmlText = await response.text();
+      const parser = new DOMParser();
+      const newDoc = parser.parseFromString(htmlText, 'text/html');
+
+      const updateDOM = () => {
+        document.title = newDoc.title;
+        document.body.innerHTML = newDoc.body.innerHTML;
+        window.history.pushState({}, '', destination);
+        window.scrollTo(0, 0);
+        
+        cursor = document.querySelector('.custom-cursor');
+        if (cursor) {
+          cursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0)`;
+        }
+        updateNameColor(true); 
+      };
+
+      if (document.startViewTransition) document.startViewTransition(updateDOM);
+      else updateDOM(); 
+    } catch (err) { window.location.href = destination; }
+  });
+
+  window.addEventListener('popstate', () => window.location.reload());
+</script>
+
+    <main class="main-frame"> 
+        <div class="frame-3">
+            <a href="index.html" style="text-decoration: none;" class="frame-31">
+                <div class="orange-square"></div>
+                <span class="name">Sanju Singh</span>
+            </a>
+            <div class="frame-2">
+                <span class="roles">UI/UX Designer   •   Product Designer   •    Figma   •   Framer</span>
+            </div>
+        </div>
+        
+        <article class="case-study">
+            <a href="index.html" class="back-link">
+                <svg class="back-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                Back / <span class="dark-text">E-Summit '26</span>
+            </a>
+         
+            <img src="images/esummitproject1.png" alt="E-Summit Hero Screen" class="cs-image">
+
+            <div class="cs-metadata">
+                <div class="meta-item">
+                    <span class="meta-label">Tools</span>
+                    <span class="meta-value">Figma, FigJam</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Timeline</span>
+                    <span class="meta-value">July 2026</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Other links</span>
+                    <span class="meta-value"><a href="https://www.behance.net/gallery/254887037/E-Summit-26-Ideas-Beyond-Boundaries" style="text-decoration: underline;">Behance</a></span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Role</span>
+                    <span class="meta-value">UI/UX Designer</span>
+                </div>
+            </div>
+
+            <div class="cs-text-section">
+                <h3>Overview</h3>
+                <p>E-Summit '26 is an event website designed to bring the energy of entrepreneurship, innovation, and startup culture into one engaging digital experience.</p>
+                <p>Built around the theme 'Ideas Beyond Boundaries', the website gives the event a distinct visual identity while helping visitors explore what the summit is all about. The design focuses on creating an experience that feels modern, immersive, and easy to navigate, balancing bold event visuals with clear content and intuitive interactions.</p>
+                <p>From communicating the event's identity to presenting essential information in an accessible way, the goal was to make the website feel like more than just an event page. It was designed as a digital introduction to the ideas, people and possibilities behind E-Summit '26.</p>
+            </div>
+
+            <img src="images/esummitproject2.png" alt="E-Summit Footer Section" class="cs-image">
+        </article>
+
+        <div class="explore-more">
+            <h3>Explore Other Projects</h3>
+            <div class="explore-grid">
+                <div class="project-card">
+                    <a href="workmate.html" class="image-frame">
+                        <img src="images/workmate.png" alt="Work Mate" class="card-image">
+                    </a>
+                    <div class="card-text">
+                        <div class="card-header">
+                            <a href="workmate.html" style="text-decoration: none;">
+                                <h3>WorkMate: Multilingual App</h3>
+                            </a>
+                            <span class="date">Fall 2026</span>
+                        </div>
+                        <p>A multilingual workforce management app that helps workers access job-related information and manage daily tasks.</p>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <a href="velo.html" class="image-frame">
+                        <img src="images/velo.png" alt="Velo Campus Mobility App" class="card-image">
+                    </a>
+                    <div class="card-text">
+                        <div class="card-header">
+                            <a href="velo.html" style="text-decoration: none;">
+                                <h3>Velo: Campus Mobility App</h3>
+                            </a>
+                            <span class="date">Fall 2026</span>
+                        </div>
+                        <p>A campus mobility platform that lets students discover, rent, and ride EV cycles and scooters with easy booking, secure payments, and real-time ride tracking.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer" data-message="say hello...">
+        <a href="https://mail.google.com/mail/u/0/#inbox" class="footer-link">isanjukatariya@gmail.com</a>
+        <a href="https://www.instagram.com/isanjukatariya" class="footer-link">Instagram</a>
+        <a href="https://www.linkedin.com/in/isanjusingh/" class="footer-link">LinkedIn</a>
+        <a href="https://www.behance.net/sanjukatariya" class="footer-link">Behance</a>
+        <a href="https://x.com/isanjukatariya" class="footer-link">X</a>
+    </footer>
+</body>
+</html>

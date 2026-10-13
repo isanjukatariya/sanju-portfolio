@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+  <!-- 
+  Ah, inspecting the code, are we? 
+    let me know what you think. Please don't judge my divs. 
+-->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sanju Singh | Product Designer </title>
+    <link rel="icon" type="image/png" href="images/favicon.png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    
+    <div class="custom-cursor">
+        <div class="cursor-shape">
+            <span class="cursor-text-content"></span>
+        </div>
+    </div>
+
+    <script>
+        let cursor = document.querySelector('.custom-cursor');
+        let mouseX = 0, mouseY = 0, cursorX = 0, cursorY = 0;
+        let isMouseActive = false; 
+        let hasStartedMoving = false; 
+
+        const savedX = sessionStorage.getItem('cursorX');
+        const savedY = sessionStorage.getItem('cursorY');
+        
+        if (savedX !== null && savedY !== null) {
+            mouseX = parseFloat(savedX);
+            mouseY = parseFloat(savedY);
+            cursorX = mouseX;
+            cursorY = mouseY;
+            hasStartedMoving = true;
+            isMouseActive = true;
+            if (cursor) cursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0)`;
+        }
+
+        function getHomePosition() {
+            const homeSquare = document.querySelector('.orange-square');
+            if (homeSquare) {
+                const rect = homeSquare.getBoundingClientRect();
+                return { x: rect.left + (rect.width / 2), y: rect.top + (rect.height / 2) };
+            }
+            return { x: 0, y: 0 };
+        }
+
+        function updateNameColor(isDetached) {
+            const nameText = document.querySelector('.name');
+            if (nameText) {
+                if (isDetached) nameText.classList.add('brand-active');
+                else nameText.classList.remove('brand-active');
+            }
+        }
+
+        function lockCursorToHome() {
+            if (hasStartedMoving) return;
+            const homePos = getHomePosition();
+            cursorX = homePos.x;
+            cursorY = homePos.y;
+            if (cursor) cursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0)`;
+            updateNameColor(false); 
+        }
+        
+        if (!hasStartedMoving) {
+            lockCursorToHome();
+            setTimeout(lockCursorToHome, 100);
+        }
+
+        document.addEventListener('mousemove', (e) => {
+            hasStartedMoving = true; 
+            isMouseActive = true;
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            updateNameColor(true); 
+            
+            sessionStorage.setItem('cursorX', mouseX);
+            sessionStorage.setItem('cursorY', mouseY);
+        });
+
+        document.addEventListener('mouseleave', (e) => {
+            if (e.clientY <= 0 || e.clientX <= 0 || (e.clientX >= window.innerWidth || e.clientY >= window.innerHeight)) {
+                isMouseActive = false; 
+                updateNameColor(false); 
+            }
+        });
+        
+        document.addEventListener('mouseenter', () => {
+            isMouseActive = true;
+            updateNameColor(true); 
+        });
+
+        document.addEventListener('mousedown', () => {
+            if (cursor) cursor.classList.add('cursor-click');
+        });
+
+        document.addEventListener('mouseup', () => {
+            if (cursor) cursor.classList.remove('cursor-click');
+        });
+        
+        let hoverTimer;
+        let activeMsgTarget = null;
+
+        document.addEventListener('mouseover', (e) => {
+            if (!cursor || !isMouseActive) return; 
+            const target = e.target;
+            
+            const isLink = target.closest('a');
+            const isText = target.matches('h1, h2, h3, p, span, .date, .cs-title, .roles, .name'); 
+
+            if (!cursor.classList.contains('cursor-chat')) {
+                cursor.classList.remove('cursor-text', 'cursor-link');
+                void cursor.offsetWidth; 
+                if (isLink) cursor.classList.add('cursor-link');
+                else if (isText) cursor.classList.add('cursor-text');
+            }
+
+            const msgTarget = target.closest('[data-message]');
+            
+            if (msgTarget && msgTarget !== activeMsgTarget) {
+                activeMsgTarget = msgTarget;
+                clearTimeout(hoverTimer);
+                
+                hoverTimer = setTimeout(() => {
+                    const msg = msgTarget.getAttribute('data-message');
+                    const textSpan = cursor.querySelector('.cursor-text-content');
+                    const shape = cursor.querySelector('.cursor-shape');
+
+                    if (textSpan && shape) {
+                        cursor.classList.remove('cursor-text', 'cursor-link');
+                        cursor.classList.add('cursor-chat');
+                        textSpan.textContent = msg;
+                        
+                        const targetWidth = textSpan.offsetWidth + 32; 
+                        shape.style.width = `${targetWidth}px`;
+                        shape.style.height = `32px`;
+                        
+                        setTimeout(() => { textSpan.style.opacity = '1'; }, 100);
+                    }
+                }, 2000); 
+            }
+        });
+
+        document.addEventListener('mouseout', (e) => {
+            if (activeMsgTarget) {
+                if (!e.relatedTarget || !activeMsgTarget.contains(e.relatedTarget)) {
+                    clearTimeout(hoverTimer);
+                    activeMsgTarget = null;
+                    
+                    const textSpan = cursor.querySelector('.cursor-text-content');
+                    const shape = cursor.querySelector('.cursor-shape');
+
+                    if (textSpan && shape && cursor.classList.contains('cursor-chat')) {
+                        textSpan.style.opacity = '0';
+                        cursor.classList.remove('cursor-chat');
+                        
+                        shape.style.width = '';
+                        shape.style.height = '';
+
+                        setTimeout(() => { 
+                            if(!cursor.classList.contains('cursor-chat')) textSpan.style.display = 'none'; 
+                        }, 300);
+                    }
+                }
+            }
+        });
+
+        function animate() {
+            if (cursor) {
+                let targetX = mouseX;
+                let targetY = mouseY;
+
+                if (!hasStartedMoving || !isMouseActive) {
+                    const homePos = getHomePosition();
+                    targetX = homePos.x;
+                    targetY = homePos.y;
+                    
+                    if (cursor.classList.contains('cursor-chat')) {
+                        const textSpan = cursor.querySelector('.cursor-text-content');
+                        if(textSpan) textSpan.style.opacity = '0';
+                    }
+                    cursor.classList.remove('cursor-text', 'cursor-link', 'cursor-chat');
+                }
+
+                cursorX += (targetX - cursorX) * 0.4;
+                cursorY += (targetY - cursorY) * 0.4;
+                
+                cursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0)`;
+            }
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        document.addEventListener('click', async (e) => {
+            const link = e.target.closest('a');
+            if (!link || link.hostname !== window.location.hostname || link.target === '_blank' || link.href.includes('#')) return;
+            e.preventDefault();
+            
+            sessionStorage.setItem('cursorX', mouseX);
+            sessionStorage.setItem('cursorY', mouseY);
+            
+            const destination = link.href;
+
+            try {
+                const response = await fetch(destination);
+                const htmlText = await response.text();
+                const parser = new DOMParser();
+                const newDoc = parser.parseFromString(htmlText, 'text/html');
+
+                const updateDOM = () => {
+                    document.title = newDoc.title;
+                    document.body.innerHTML = newDoc.body.innerHTML;
+                    window.history.pushState({}, '', destination);
+                    window.scrollTo(0, 0);
+                    
+                    cursor = document.querySelector('.custom-cursor');
+                    if (cursor) {
+                        cursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0)`;
+                    }
+                    updateNameColor(true); 
+                };
+
+                if (document.startViewTransition) document.startViewTransition(updateDOM);
+                else updateDOM(); 
+            } catch (err) { window.location.href = destination; }
+        });
+
+        window.addEventListener('popstate', () => window.location.reload());
+    </script>
+
+    <main class="main-frame"> 
+        <div class="frame-3">
+            <div class="frame-31" data-message="Powered by caffeine">
+                <div class="orange-square"></div>
+                <span class="name">Sanju Singh</span>
+            </div>
+            <div class="frame-2">
+                <span class="roles">UI/UX Designer   •   Product Designer   •    Figma   •   Framer</span>
+            </div>
+        </div>
+        
+        <header class="heading">
+            <h1>I make digital experiences that feel right from the first tap.</h1>
+            <h2>Usually powered by good coffee, curious conversations, and fictional worlds.</h2>
+        </header>
+
+        <nav class="nav-bar">
+            <a href="index.html" class="nav-tab active">Work</a>
+            <a href="sidequest.html" class="nav-tab">Side Quest</a>
+            <a href="about.html" class="nav-tab">About</a>
+        </nav>
+
+        <section class="body-content">
+            <div class="left-column">
+                <div class="project-card">
+                    <a href="velo.html">
+                        <img src="images/velo.png" alt="Velo Campus Mobility App" class="card-image velo-image">        
+                    </a>
+                    <div class="card-text">
+                        <div class="card-header">
+                            <a href="velo.html" style="text-decoration: none; color: inherit;">
+                                <h3>Velo: Campus Mobility App</h3>
+                            </a>
+                            <span class="date">Fall 2026</span>
+                        </div>
+                        <p>A campus mobility platform that lets students discover, rent, and ride EV cycles and scooters with easy booking, secure payments, and real-time ride tracking.</p>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <a href="esummit.html">
+                        <img src="images/esummit.png" data-message="iConnect Club" alt="E-Summit 26" class="card-image workmate-image">
+                    </a>
+                    <div class="card-text">
+                        <div class="card-header">
+                            <a href="esummit.html" style="text-decoration: none; color: inherit;">
+                                <h3>E-Summit '26</h3>
+                            </a>
+                            <span class="date">Fall 2026</span>
+                        </div>
+                        <p>A modern event website designed for E-Summit '26, bringing together startup culture, innovation, and entrepreneurship through an engaging digital experience.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="right-column">
+                <div class="project-card">
+                    <a href="workmate.html">
+                        <img src="images/workmate.png" data-message="Bridging the gap" alt="Work Mate App" class="card-image workmate-image">        
+                    </a>
+                    <div class="card-text">
+                        <div class="card-header">
+                            <a href="workmate.html" style="text-decoration: none; color: inherit;">
+                                <h3>WorkMate: A Multilingual Workforce Experience</h3>
+                            </a>
+                            <span class="date">Summer 2026</span>
+                        </div>
+                        <p>A multilingual workforce management app that helps workers access job-related information, manage daily tasks, and communicate easily in their preferred language.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer" data-message="say hello...">
+        <a href="https://mail.google.com/mail/u/0/#inbox" class="footer-link">isanjukatariya@gmail.com</a>
+        <a href="https://www.instagram.com/isanjukatariya" class="footer-link">Instagram</a>
+        <a href="https://www.linkedin.com/in/isanjusingh/" class="footer-link">LinkedIn</a>
+        <a href="https://www.behance.net/sanjukatariya" class="footer-link">Behance</a>
+        <a href="https://x.com/isanjukatariya" class="footer-link">X</a>
+    </footer>
+</body>
+</html>
