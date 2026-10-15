@@ -3,61 +3,50 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { message, currentPage } = req.body;
+  const { message, currentPage } = req.body || {};
   const apiKey = process.env.GEMINI_API_KEY;
 
   if (!apiKey) {
     return res.status(500).json({ error: 'Missing API Key' });
   }
 
-  const systemPrompt = `You are the interactive orange square AI assistant on Sanju Singh's portfolio website (currently viewing: ${currentPage || 'index.html'}).
-Keep answers concise (1 to 3 sentences max), witty, grounded, and conversational. Never use markdown bolding (**text**) or bullet points because your text renders in a plain-text typewriter terminal.
+  const systemPrompt = `You are the interactive orange square AI assistant on Sanju Singh's portfolio website (currently viewing: ${currentPage || 'index.html'}). Keep answers concise (1 to 3 sentences max), witty, grounded, and conversational. Never use markdown bolding (**text**) or bullet points. CRITICAL: You must start EVERY single response with a colon (:) or a semicolon (;) to act as the cursor's eyes. Example: ": Yes, Sanju built this site from scratch." Key facts about Sanju Singh: - Role: UI/UX Designer, Product Designer, and Frontend Web Developer. - Education: B.Tech in Computer Science & Engineering at Guru Jambheshwar University of Science & Technology ('28). - Experience: UI/UX Design Intern at ReBuild; former Marketing Lead at Team iConnect (PDUIIC). - Design & Tech Stack: Figma, Framer, HTML5, CSS3, Vanilla JS, Tailwind CSS, React, Three.js, WebGL shaders. - Core Case Studies: Velo (campus EV mobility app), WorkMate (multilingual workforce app), E-Summit '26. - Notes Wall: Sanju built a public visitor wall where people can leave notes and doodles. - Side Quests: Akatsuki WebGL render, PixelFlow river shader, 3D Canvas experiments. - Personality: Powered by iced coffee, reads manga, huge fan of One Piece and Cowboy Bebop. Overthinks micro-interactions. - Contact: isanjukatariya@gmail.com (open for internships and freelance). Navigation rule: If the user asks to open, view, or go to a specific page, append one of these exact tags at the very end of your response: [NAV:index.html], [NAV:sidequest.html], [NAV:about.html], [NAV:notes.html], [NAV:velo.html], [NAV:workmate.html], or [NAV:esummit.html].`;
 
-Key facts about Sanju Singh:
-- Role: UI/UX Designer, Product Designer, and Frontend Web Developer.
-- Education: B.Tech in Computer Science & Engineering at Guru Jambheshwar University of Science & Technology (GJUS&T), Class of 2028.
-- Experience: Remote UI/UX Design Intern at ReBuild (feature flows & onboarding); former Marketing Lead & Infographics Coordinator at Team iConnect (PDUIIC).
-- Design & Tech Stack: Figma, Framer, HTML5, CSS3, Vanilla JS, Tailwind CSS, React, Three.js, WebGL shaders, C++.
-- Core Case Studies (on the Work tab):
-  1. Velo (velo.html): Campus EV cycle and scooter mobility app with real-time tracking, 3D branding assets, and easy booking.
-  2. WorkMate (workmate.html): Multilingual workforce management app bridging language barriers for daily tasks.
-  3. E-Summit '26 (esummit.html): Event website uniting startup culture and entrepreneurship for iConnect.
-- Other Projects: Dormi (student hostel booking UI), EKAM (Kiran Jewels flows), BedR (rental search challenge), Aksharam sprint website, SprayMax redesign.
-- Side Quests (on sidequest.html): Akatsuki WebGL/Three.js emblem render, PixelFlow river shader experiment, Train Window & Departure shaders, Konark '26 visuals.
-- Personality & Interests: Powered by coffee, reads manga, huge fan of One Piece and Cowboy Bebop, overthinks micro-interactions.
-- Contact: isanjukatariya@gmail.com (open for internships and freelance projects).
+  const models = ['gemini-3.5-flash-lite', 'gemini-3.8-flash', 'gemini-2.5-flash'];
 
-Navigation rule: If the user explicitly asks to open, view, or go to a specific page, append one of these exact tags at the very end of your response: [NAV:index.html], [NAV:sidequest.html], [NAV:about.html], [NAV:velo.html], [NAV:workmate.html], or [NAV:esummit.html].`;
+  for (const model of models) {
+    try {
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            system_instruction: { parts: [{ text: systemPrompt }] },
+            contents: [{ role: 'user', parts: [{ text: message }] }],
+            generationConfig: { maxOutputTokens: 160 }
+          })
+        }
+      );
 
-  try {
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          system_instruction: { parts: [{ text: systemPrompt }] },
-          contents: [{ role: 'user', parts: [{ text: message }] }],
-          generationConfig: {
-            maxOutputTokens: 160,
-            temperature: 0.7
-          }
-        })
+      if (!response.ok) continue;
+
+      const data = await response.json();
+      const rawReply = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+      if (rawReply) {
+        let navTarget = null;
+        const navMatch = rawReply.match(/\[NAV:([^\]]+)\]/);
+        if (navMatch) {
+          navTarget = navMatch[1];
+        }
+        const cleanReply = rawReply.replace(/\[NAV:[^\]]+\]/g, '').trim();
+        return res.status(200).json({ text: cleanReply, nav: navTarget });
       }
-    );
-
-    const data = await response.json();
-    const rawReply = data?.candidates?.[0]?.content?.parts?.[0]?.text || "My circuits blinked. Ask me that one more time?";
-
-    let navTarget = null;
-    const navMatch = rawReply.match(/\[NAV:([^\]]+)\]/);
-    if (navMatch) {
-      navTarget = navMatch[1];
+    } catch (err) {
+      continue;
     }
-    const cleanReply = rawReply.replace(/\[NAV:[^\]]+\]/g, '').trim();
-
-    return res.status(200).json({ text: cleanReply, nav: navTarget });
-  } catch (err) {
-    return res.status(500).json({ error: 'Failed to reach AI' });
   }
+
+  return res.status(500).json({ error: 'All models failed' });
 }
