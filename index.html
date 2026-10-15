@@ -19,6 +19,89 @@
         </div>
     </div>
 
+    <main class="main-frame"> 
+        <div class="frame-3">
+            <div class="frame-31" data-message="; Click or press / to talk to me!">
+                <div class="orange-square"></div>
+                <span class="name">Sanju Singh</span>
+            </div>
+            <div class="frame-2">
+                <span class="roles">UI/UX Designer   •   Product Designer   •    Figma   •   Framer</span>
+            </div>
+        </div>
+        
+        <header class="heading" data-message=": Crafted with caffeine & care">
+            <h1>I make digital experiences that feel right from the first tap.</h1>
+            <h2>Usually powered by good coffee, curious conversations, and fictional worlds.</h2>
+        </header>
+
+        <nav class="nav-bar">
+            <a href="index.html" class="nav-tab active">Work</a>
+            <a href="sidequest.html" class="nav-tab">Side Quest</a>
+            <a href="notes.html" class="nav-tab">Notes</a>
+            <a href="about.html" class="nav-tab">About</a>
+        </nav>
+
+        <section class="body-content">
+            <div class="left-column">
+                <div class="project-card">
+                    <a href="velo.html">
+                        <img src="images/velo.png" data-message=": Campus EV rides & 3D branding" alt="Velo Campus Mobility App" class="card-image velo-image">        
+                    </a>
+                    <div class="card-text">
+                        <div class="card-header">
+                            <a href="velo.html" style="text-decoration: none; color: inherit;">
+                                <h3>Velo: Campus Mobility App</h3>
+                            </a>
+                            <span class="date">Fall 2026</span>
+                        </div>
+                        <p>A campus mobility platform that lets students discover, rent, and ride EV cycles and scooters with easy booking, secure payments, and real-time ride tracking.</p>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <a href="esummit.html">
+                        <img src="images/esummit.png" data-message=": iConnect Club flagship event" alt="E-Summit 26" class="card-image workmate-image">
+                    </a>
+                    <div class="card-text">
+                        <div class="card-header">
+                            <a href="esummit.html" style="text-decoration: none; color: inherit;">
+                                <h3>E-Summit '26</h3>
+                            </a>
+                            <span class="date">Fall 2026</span>
+                        </div>
+                        <p>A modern event website designed for E-Summit '26, bringing together startup culture, innovation, and entrepreneurship through an engaging digital experience.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="right-column">
+                <div class="project-card">
+                    <a href="workmate.html">
+                        <img src="images/workmate.png" data-message=": Bridging the language gap" alt="Work Mate App" class="card-image workmate-image">        
+                    </a>
+                    <div class="card-text">
+                        <div class="card-header">
+                            <a href="workmate.html" style="text-decoration: none; color: inherit;">
+                                <h3>WorkMate: A Multilingual Workforce Experience</h3>
+                            </a>
+                            <span class="date">Summer 2026</span>
+                        </div>
+                        <p>A multilingual workforce management app that helps workers access job-related information, manage daily tasks, and communicate easily in their preferred language.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer" data-message="; don't be shy, say hello...">
+        <a href="https://mail.google.com/mail/u/0/#inbox" class="footer-link">isanjukatariya@gmail.com</a>
+        <a href="https://www.instagram.com/isanjukatariya" class="footer-link">Instagram</a>
+        <a href="https://www.linkedin.com/in/isanjusingh/" class="footer-link">LinkedIn</a>
+        <a href="https://www.behance.net/sanjukatariya" class="footer-link">Behance</a>
+        <a href="https://x.com/isanjukatariya" class="footer-link">X</a>
+    </footer>
+
 <script>
     let cursor = document.querySelector('.custom-cursor');
     let mouseX = 0, mouseY = 0, cursorX = 0, cursorY = 0;
@@ -31,7 +114,6 @@
     let idleTimeout = null;
     let clickCount = 0;
 
-    // PASTE YOUR FREE FIREBASE REALTIME DB URL HERE (Optional, for global cloud notes)
     const FIREBASE_DB_URL = "https://sanju-portfolio-notes-default-rtdb.asia-southeast1.firebasedatabase.app/"; 
 
     const clickReactions = [
@@ -359,6 +441,20 @@
     }
 
     function decorateInteractiveTargets() {
+        const navBar = document.querySelector('.nav-bar');
+        if (navBar && !navBar.querySelector('a[href="notes.html"]')) {
+            const notesLink = document.createElement('a');
+            notesLink.href = 'notes.html';
+            notesLink.className = 'nav-tab';
+            notesLink.textContent = 'Notes';
+            if (window.location.pathname.includes('notes.html')) {
+                notesLink.classList.add('active');
+            }
+            const aboutLink = navBar.querySelector('a[href="about.html"]');
+            if (aboutLink) navBar.insertBefore(notesLink, aboutLink);
+            else navBar.appendChild(notesLink);
+        }
+
         const veloImg = document.querySelector('.velo-image');
         if (veloImg && !veloImg.hasAttribute('data-message')) veloImg.setAttribute('data-message', ': Campus EV rides & 3D branding');
         const navWork = document.querySelector('a[href="index.html"].nav-tab');
@@ -449,6 +545,7 @@
                 });
                 if (!res.ok) throw new Error('API fallback');
                 const data = await res.json();
+                if (!data.text || data.text.includes('circuits blinked')) throw new Error('API fallback');
                 typeAIMessage(data.text, outputEl);
                 if (data.nav) setTimeout(() => navigateToPage(data.nav), 1600);
             } catch (err) {
@@ -468,9 +565,6 @@
         });
     }
 
-    // ==========================================
-    // NOTES WALL + DOODLE CANVAS LOGIC
-    // ==========================================
     let hasDrawnDoodle = false;
     let doodleStrokeColor = '#DC5C2C';
     let doodleHistory = [];
@@ -491,10 +585,14 @@
         if (FIREBASE_DB_URL) {
             try {
                 const res = await fetch(`${FIREBASE_DB_URL.replace(/\/$/, '')}/notes.json`);
-                const data = await res.json();
-                if (data) {
-                    const cloudNotes = Object.values(data).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-                    allNotes = [...cloudNotes, ...starterNotes];
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && typeof data === 'object' && !data.error) {
+                        const cloudNotes = Object.values(data)
+                            .filter(item => item && typeof item === 'object')
+                            .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+                        allNotes = [...cloudNotes, ...starterNotes];
+                    }
                 }
             } catch (e) { console.warn('Using local notes'); }
         }
@@ -585,9 +683,7 @@
         window.addEventListener('touchend', () => { isDrawing = false; });
     }
 
-    // Global delegated clicks so buttons ALWAYS work even after SPA page swaps
     document.addEventListener('click', async (e) => {
-        // 1. Open Note Composer
         if (e.target.closest('#openComposerBtn')) {
             const composer = document.getElementById('noteComposer');
             if (composer) {
@@ -600,14 +696,12 @@
             return;
         }
 
-        // 2. Close Note Composer
         if (e.target.closest('#closeComposer')) {
             const composer = document.getElementById('noteComposer');
             if (composer) composer.classList.remove('open');
             return;
         }
 
-        // 3. Toggle Doodle Pad
         if (e.target.closest('#toggleDoodleBtn')) {
             const doodleWrapper = document.getElementById('doodlePadWrapper');
             const doodleArrow = document.getElementById('doodleArrow');
@@ -619,7 +713,6 @@
             return;
         }
 
-        // 4. Color Swatch Selection
         const swatch = e.target.closest('.color-swatch');
         if (swatch) {
             document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
@@ -628,7 +721,6 @@
             return;
         }
 
-        // 5. Clear Doodle
         if (e.target.closest('#clearDoodle')) {
             const canvas = document.getElementById('doodleCanvas');
             if (canvas) {
@@ -639,7 +731,6 @@
             return;
         }
 
-        // 6. Undo Doodle
         if (e.target.closest('#undoDoodle')) {
             const canvas = document.getElementById('doodleCanvas');
             if (canvas) {
@@ -660,14 +751,12 @@
             return;
         }
 
-        // 7. Page Navigation Links
         const link = e.target.closest('a');
         if (!link || link.hostname !== window.location.hostname || link.target === '_blank' || link.href.includes('#')) return;
         e.preventDefault();
         navigateToPage(link.href);
     });
 
-    // Global delegated form submit for posting notes
     document.addEventListener('submit', async (e) => {
         if (e.target && e.target.id === 'noteForm') {
             e.preventDefault();
@@ -760,88 +849,5 @@
 
     window.addEventListener('popstate', () => window.location.reload());
 </script>
-
-    <main class="main-frame"> 
-        <div class="frame-3">
-            <div class="frame-31" data-message="; Click or press / to talk to me!">
-                <div class="orange-square"></div>
-                <span class="name">Sanju Singh</span>
-            </div>
-            <div class="frame-2">
-                <span class="roles">UI/UX Designer   •   Product Designer   •    Figma   •   Framer</span>
-            </div>
-        </div>
-        
-        <header class="heading" data-message=": Crafted with caffeine & care">
-            <h1>I make digital experiences that feel right from the first tap.</h1>
-            <h2>Usually powered by good coffee, curious conversations, and fictional worlds.</h2>
-        </header>
-
-        <nav class="nav-bar">
-    <a href="index.html" class="nav-tab active">Work</a>
-    <a href="sidequest.html" class="nav-tab">Side Quest</a>
-    <a href="notes.html" class="nav-tab">Notes</a>
-    <a href="about.html" class="nav-tab">About</a>
-</nav>
-
-        <section class="body-content">
-            <div class="left-column">
-                <div class="project-card">
-                    <a href="velo.html">
-                        <img src="images/velo.png" data-message=": Campus EV rides & 3D branding" alt="Velo Campus Mobility App" class="card-image velo-image">        
-                    </a>
-                    <div class="card-text">
-                        <div class="card-header">
-                            <a href="velo.html" style="text-decoration: none; color: inherit;">
-                                <h3>Velo: Campus Mobility App</h3>
-                            </a>
-                            <span class="date">Fall 2026</span>
-                        </div>
-                        <p>A campus mobility platform that lets students discover, rent, and ride EV cycles and scooters with easy booking, secure payments, and real-time ride tracking.</p>
-                    </div>
-                </div>
-
-                <div class="project-card">
-                    <a href="esummit.html">
-                        <img src="images/esummit.png" data-message=": iConnect Club flagship event" alt="E-Summit 26" class="card-image workmate-image">
-                    </a>
-                    <div class="card-text">
-                        <div class="card-header">
-                            <a href="esummit.html" style="text-decoration: none; color: inherit;">
-                                <h3>E-Summit '26</h3>
-                            </a>
-                            <span class="date">Fall 2026</span>
-                        </div>
-                        <p>A modern event website designed for E-Summit '26, bringing together startup culture, innovation, and entrepreneurship through an engaging digital experience.</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="right-column">
-                <div class="project-card">
-                    <a href="workmate.html">
-                        <img src="images/workmate.png" data-message=": Bridging the language gap" alt="Work Mate App" class="card-image workmate-image">        
-                    </a>
-                    <div class="card-text">
-                        <div class="card-header">
-                            <a href="workmate.html" style="text-decoration: none; color: inherit;">
-                                <h3>WorkMate: A Multilingual Workforce Experience</h3>
-                            </a>
-                            <span class="date">Summer 2026</span>
-                        </div>
-                        <p>A multilingual workforce management app that helps workers access job-related information, manage daily tasks, and communicate easily in their preferred language.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <footer class="footer" data-message="; don't be shy, say hello...">
-        <a href="https://mail.google.com/mail/u/0/#inbox" class="footer-link">isanjukatariya@gmail.com</a>
-        <a href="https://www.instagram.com/isanjukatariya" class="footer-link">Instagram</a>
-        <a href="https://www.linkedin.com/in/isanjusingh/" class="footer-link">LinkedIn</a>
-        <a href="https://www.behance.net/sanjukatariya" class="footer-link">Behance</a>
-        <a href="https://x.com/isanjukatariya" class="footer-link">X</a>
-    </footer>
 </body>
 </html>
