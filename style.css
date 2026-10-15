@@ -1061,6 +1061,7 @@ input {
     max-height: 440px;
   }
 }
+
 /* ==========================================
    NOTES WALL & DOODLE PAD
    ========================================== */
@@ -1074,15 +1075,15 @@ textarea, select, canvas {
 }
 
 .notes-masonry {
-  column-count: 3;
-  column-gap: 14px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
   width: 100%;
+  align-items: start;
 }
 
 .new-note-trigger,
 .note-card {
-  break-inside: avoid;
-  margin-bottom: 14px;
   width: 100%;
   box-sizing: border-box;
 }
@@ -1151,7 +1152,6 @@ textarea, select, canvas {
   font-weight: 400;
 }
 
-/* Expandable Note Composer */
 .note-composer-wrapper {
   max-height: 0;
   opacity: 0;
@@ -1325,7 +1325,7 @@ textarea, select, canvas {
     cursor: auto !important;
   }
   .notes-masonry {
-    column-count: 1;
+    grid-template-columns: 1fr;
   }
   .composer-footer {
     flex-direction: column;
