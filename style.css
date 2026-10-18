@@ -234,7 +234,7 @@ h2 {
   display: flex;
   gap: 14px;
   width: 100%;
-  margin-top: 40px;
+  margin-top: 20px;
 }
 
 .grid-col {
@@ -891,22 +891,24 @@ body, a, img, h3, p, span, button, input, textarea, select, canvas {
 
 .notes-section {
   width: 100%;
-  margin-top: 28px;
+  margin-top: 20px;
 }
 
 .notes-masonry {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 14px;
+  display: block !important;
+  column-count: 3;
+  column-gap: 14px;
   width: 100%;
-  align-items: start;
 }
 
 .new-note-trigger,
 .note-card {
+  break-inside: avoid;
+  margin-bottom: 14px;
   width: 100%;
-  box-sizing: border-box;
 }
+
+
 
 .new-note-trigger {
   display: flex;
@@ -1375,82 +1377,7 @@ html.lenis, html.lenis body {
   letter-spacing: 0.3px;
   pointer-events: none;
 }
-.orange-preloader {
-  position: fixed;
-  inset: 0;
-  z-index: 99995;
-  background-color: #FFFFFF;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 14px;
-  transition: transform 0.65s cubic-bezier(0.76, 0, 0.24, 1),
-              opacity 0.45s ease;
-  will-change: transform, opacity;
-}
 
-.orange-preloader.preload-done {
-  transform: translateY(-100%);
-  pointer-events: none;
-}
-
-.preloader-cube {
-  width: 24px;
-  height: 24px;
-  background-color: #DC5C2C;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  animation: preload-bounce 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-}
-
-.preloader-cube span {
-  width: 3px;
-  height: 5px;
-  background-color: #FFFFFF;
-  transition: height 0.1s ease;
-}
-
-.preloader-cube.blink span {
-  height: 1px;
-}
-
-.preloader-meta {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-family: 'Bricolage Grotesque', sans-serif;
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--text-secondary);
-  letter-spacing: 0.4px;
-  font-variant-numeric: tabular-nums;
-}
-
-.preloader-percent {
-  color: #DC5C2C;
-  font-weight: 600;
-}
-
-@keyframes preload-bounce {
-  0% { transform: scale(0) rotate(-12deg); opacity: 0; }
-  70% { transform: scale(1.18) rotate(3deg); opacity: 1; }
-  100% { transform: scale(1) rotate(0deg); opacity: 1; }
-}
-
-.nav-tab,
-.ai-badge,
-.ai-chip,
-.btn-home-orange,
-.btn-secondary-outline {
-  transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1),
-              background-color 0.2s ease,
-              color 0.2s ease,
-              border-color 0.2s ease;
-  will-change: transform;
-}
 
 @media (max-width: 768px) {
   body, img, h3, p, span, input, textarea, select, canvas {
@@ -1601,6 +1528,7 @@ html.lenis, html.lenis body {
     display: grid !important;
     grid-template-columns: 1fr 1fr !important;
     gap: 12px !important;
+    margin-top: 0px !important;
   }
 
   .grid-col {
@@ -1677,12 +1605,214 @@ html.lenis, html.lenis body {
     gap: 24px !important;
   }
 
-  .notes-masonry {
-    grid-template-columns: 1fr !important;
+ .notes-masonry {
+    column-count: 1 !important;
   }
 
   .composer-footer {
     flex-direction: column;
     align-items: stretch;
+  }
+}
+.note-composer-wrapper.open ~ .notes-masonry #openComposerBtn {
+  border-color: var(--text-third);
+  color: var(--text-third);
+}
+
+
+
+/* ==========================================================================
+   NATIVE EDITORIAL CASE STUDY LAYOUT (SHARP CORNERS & STILL IMAGES)
+   ========================================================================== */
+
+/* Lock all case study images completely still on hover */
+.cs-image,
+.cs-image:hover,
+.cs-deck-body img,
+.cs-deck-body img:hover {
+  transform: none !important;
+  transition: none !important;
+  border-radius: 0px !important;
+}
+
+.cs-eyebrow {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: #DC5C2C;
+  margin-bottom: 4px;
+  display: inline-block;
+}
+
+/* 2-Column Editorial Split separated by a clean hairline */
+.cs-split-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  width: 100%;
+  margin-bottom: 60px;
+  padding-bottom: 48px;
+  border-bottom: 1px solid #E0E0E0;
+}
+
+.cs-col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cs-col h4 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.cs-col p {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* Flat Architectural Metrics Strip (Matches .cs-metadata) */
+.cs-stats-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 32px;
+  width: 100%;
+  margin-bottom: 60px;
+  padding: 28px 0;
+  border-top: 1px solid #E0E0E0;
+  border-bottom: 1px solid #E0E0E0;
+}
+
+.cs-stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.cs-stat-num {
+  font-size: 32px;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -0.5px;
+  line-height: 1.1;
+}
+
+.cs-stat-label {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+/* Sharp 2-Column Feature Index */
+.cs-feature-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px 48px;
+  margin-top: 16px;
+}
+
+.cs-feature-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(50, 64, 79, 0.12);
+}
+
+.cs-feature-row strong {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.cs-feature-row span {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+/* Behance Presentation Frame (Matches .orange-ai-box / .lost-card) */
+.cs-deck-wrapper {
+  width: 100%;
+  margin: 16px 0 60px 0;
+  background-color: rgba(220, 92, 44, 0.05);
+  border: 1px solid rgba(220, 92, 44, 0.35);
+  border-radius: 0px !important;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.cs-deck-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(220, 92, 44, 0.18);
+  padding-bottom: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #DC5C2C;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.cs-deck-toggle {
+  background-color: #DC5C2C;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 0px !important;
+  padding: 6px 12px;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  transition: opacity 0.2s ease;
+}
+
+.cs-deck-toggle:hover {
+  opacity: 0.88;
+}
+
+.cs-deck-body {
+  max-height: 720px;
+  overflow-y: auto;
+  border: 1px solid rgba(50, 64, 79, 0.12);
+  border-radius: 0px !important;
+  background-color: #0D120E;
+  transition: max-height 0.45s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.cs-deck-body.expanded {
+  max-height: 28000px;
+}
+
+.cs-deck-body img {
+  width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 !important;
+}
+
+@media (max-width: 768px) {
+  .cs-split-grid,
+  .cs-feature-grid {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .cs-stats-row {
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .cs-deck-wrapper {
+    padding: 14px;
   }
 }
