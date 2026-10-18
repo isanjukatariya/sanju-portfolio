@@ -877,24 +877,35 @@ function initNotesWall() {
 }
 
 document.addEventListener('click', async (e) => {
-    if (e.target.closest('#openComposerBtn')) {
+    const openBtn = e.target.closest('#openComposerBtn');
+    if (openBtn) {
         const composer = document.getElementById('noteComposer');
         if (composer) {
-            composer.classList.add('open');
-            initNotesWall();
-            showCursorSpeech('; write something cool!', 1600, ';');
-            const msgInput = document.getElementById('noteMessage');
-            if (msgInput) setTimeout(() => msgInput.focus(), 200);
+            const isOpen = composer.classList.toggle('open');
+            openBtn.textContent = isOpen ? '- Click to hide' : '+ New note';
+            
+            if (isOpen) {
+                initNotesWall();
+                showCursorSpeech('; write something cool!', 1600, ';');
+                const msgInput = document.getElementById('noteMessage');
+                if (msgInput) setTimeout(() => msgInput.focus(), 200);
+            } else {
+                showCursorSpeech(': maybe next time!', 1200, ':');
+            }
         }
         return;
     }
 
     if (e.target.closest('#closeComposer')) {
         const composer = document.getElementById('noteComposer');
+        const btn = document.getElementById('openComposerBtn');
         if (composer) composer.classList.remove('open');
+        if (composer) composer.classList.remove('open');
+        const openBtn = document.getElementById('openComposerBtn');
+        if (openBtn) openBtn.textContent = '+ New note';
+        if (btn) btn.textContent = '+ New note';
         return;
     }
-
     if (e.target.closest('#toggleDoodleBtn')) {
         const doodleWrapper = document.getElementById('doodlePadWrapper');
         const doodleArrow = document.getElementById('doodleArrow');
@@ -1035,6 +1046,8 @@ document.addEventListener('keydown', (e) => {
         const composer = document.getElementById('noteComposer');
         if (composer && composer.classList.contains('open')) {
             composer.classList.remove('open');
+            const openBtn = document.getElementById('openComposerBtn');
+            if (openBtn) openBtn.textContent = '+ New note';
         }
     }
 });
