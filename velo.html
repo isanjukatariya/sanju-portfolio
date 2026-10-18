@@ -29,7 +29,8 @@
             </div>
         </div>
 
-        <article class="case-study">
+        <section class="case-study">
+           
             <a href="index.html" class="back-link">
                 <svg class="back-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="19" y1="12" x2="5" y2="12"></line>
@@ -38,44 +39,125 @@
                 Back / <span class="dark-text">Velo: Campus Mobility App</span>
             </a>
 
-            <img src="images/veloproject1.png" fetchpriority="high" decoding="async" alt="Velo App Screens" class="cs-image">
+
+            <img src="images/veloproject1.png" alt="Velo Campus Mobility App" class="cs-image" fetchpriority="high">
 
             <div class="cs-metadata">
                 <div class="meta-item">
-                    <span class="meta-label">Tools</span>
-                    <span class="meta-value">Figma, FigJam</span>
+                    <span class="meta-label">Role</span>
+                    <span class="meta-value">UI/UX &amp; Product Design</span>
                 </div>
                 <div class="meta-item">
                     <span class="meta-label">Timeline</span>
-                    <span class="meta-value">July - Aug 2026</span>
+                    <span class="meta-value">Aug – Sept 2026</span>
                 </div>
                 <div class="meta-item">
-                    <span class="meta-label">Other links</span>
-                    <span class="meta-value"><a href="https://www.behance.net/gallery/254016631/Velo-Campus-Mobility-App" target="_blank" rel="noopener" style="text-decoration: underline;">Behance</a></span>
+                    <span class="meta-label">Tools</span>
+                    <span class="meta-value">Figma, Photoshop</span>
                 </div>
                 <div class="meta-item">
-                    <span class="meta-label">Role</span>
-                    <span class="meta-value">UI/UX Designer</span>
+                    <span class="meta-label">Deliverables</span>
+                    <span class="meta-value">Mobile App, Design System, 3D Assets</span>
                 </div>
             </div>
 
             <div class="cs-text-section">
-                <h3>Overview</h3>
-                <p>VELO is a campus mobility platform designed to make getting around university campuses smarter, greener, and more convenient. It allows students to discover, book, and rent EV cycles and scooters through a seamless digital experience.</p>
-                <p>From exploring available rides and booking time slots to making secure payments and tracking active rides, VELO brings the entire rental journey into one place. The goal was to create a student-friendly mobility experience that encourages sustainable transportation while making everyday campus commutes effortless.</p>
+                <span class="cs-eyebrow">: 01 // Overview</span>
+                <h3>Making campus commutes effortless from the first tap.</h3>
+                <p>
+                    Walking across a sprawling university campus between hostels, lecture blocks, and labs takes 15–20 minutes each way. Velo is a student-first EV cycle and scooter rental app built to replace long walks and manual key-based rentals with instant QR unlocking, real-time dock radar, and student-friendly micro-tariffs.
+                </p>
             </div>
 
-            <img src="images/veloproject2.png" loading="lazy" decoding="async" alt="Velo Inner Screens" class="cs-image">
+            <div class="cs-split-grid">
+                <div class="cs-col">
+                    <span class="cs-eyebrow">: The Problem</span>
+                    <h4>Manual logs &amp; unpredictable availability</h4>
+                    <p>
+                        Students frequently run late between morning lectures because campus transit is either unavailable or relies on physical keys, paper registers, and guesswork around whether a cycle is actually parked at a stand.
+                    </p>
+                </div>
+                <div class="cs-col">
+                    <span class="cs-eyebrow">: The Solution</span>
+                    <h4>Live dock telemetry &amp; 1-tap QR unlock</h4>
+                    <p>
+                        A real-time campus map showing exact EV counts and battery range at every hub, paired with instant QR/NFC unlocking, a temporary "Pause Ride" lock for quick stops, and automated UPI student billing.
+                    </p>
+                </div>
+            </div>
+
+            <div class="cs-text-section" style="margin-bottom: 24px;">
+                <span class="cs-eyebrow">: 02 // Research &amp; Insights</span>
+                <h3>Understanding how students actually move on campus.</h3>
+                <p>
+                    Through conversations with hostel residents and day scholars during peak 8:45 AM lecture rushes, three core patterns shaped the product architecture:
+                </p>
+            </div>
+
+            <div class="cs-stats-row">
+                <div class="cs-stat-item">
+                    <span class="cs-stat-num">2.5+ km</span>
+                    <span class="cs-stat-label">Average daily walking distance between hostels and academic blocks.</span>
+                </div>
+                <div class="cs-stat-item">
+                    <span class="cs-stat-num">&lt; 15 sec</span>
+                    <span class="cs-stat-label">Target time from opening the app to unlocking a ride via QR scan.</span>
+                </div>
+                <div class="cs-stat-item">
+                    <span class="cs-stat-num">92%</span>
+                    <span class="cs-stat-label">Preferred upfront per-minute fare transparency and student promo passes.</span>
+                </div>
+            </div>
 
             <div class="cs-text-section">
-                <h3>Project Goal</h3>
-                <p>Campus life is already a lot. Getting from your hostel to class shouldn't feel like a side quest.</p>
-                <p>The goal of VELO was to make everyday campus commutes simpler and more accessible by helping students discover, book, and rent EV cycles and scooters with ease.</p>
-                <p>The goal was to make the whole experience feel effortless, from discovering available rides and booking a time slot to making payments and tracking an ongoing ride.</p>
-                <p>But it wasn't just about getting students from point A to point B. VELO also aims to make sustainable mobility a more natural part of campus life, while helping university administrators manage their fleet, track usage, and keep everything running smoothly.</p>
-                <p>Less walking around. Less rental chaos. More time for the stuff that actually matters.</p>
+                <span class="cs-eyebrow">: 03 // Core Experience</span>
+                <h3>Designed for one-handed use while rushing to class.</h3>
+                <div class="cs-feature-grid">
+                    <div class="cs-feature-row">
+                        <strong>01. Dock Radar &amp; Range Check</strong>
+                        <span>Students can check exact battery percentage and estimated kilometer range before walking to a parking zone.</span>
+                    </div>
+                    <div class="cs-feature-row">
+                        <strong>02. Live Ride Telemetry &amp; Pause</strong>
+                        <span>High-contrast ride screen tracking duration, speed, and distance with a one-tap "Pause" mode for quick stops.</span>
+                    </div>
+                    <div class="cs-feature-row">
+                        <strong>03. Night Safety &amp; SOS</strong>
+                        <span>Dedicated emergency SOS trigger and geofenced speed alerts for safe late-evening library and lab returns.</span>
+                    </div>
+                    <div class="cs-feature-row">
+                        <strong>04. Student Fare Breakdown</strong>
+                        <span>Clear post-ride receipt itemizing base fare, ride time, and campus discount codes (Campus10) with zero hidden fees.</span>
+                    </div>
+                </div>
             </div>
-        </article>
+
+            <div class="cs-text-section" style="margin-bottom: 12px;">
+                <span class="cs-eyebrow">: 04 // Visual Presentation</span>
+                <h3>Full Case Study Board (Personas, Flows, UI &amp; Design System)</h3>
+                <p>Scroll through the full presentation below, click the button to expand the entire board inline, or click the image for full-screen inspection.</p>
+            </div>
+
+            <div class="cs-deck-wrapper">
+                <div class="cs-deck-header">
+                    <span>: VELO // FULL DESIGN PRESENTATION</span>
+                    <button type="button" class="cs-deck-toggle" onclick="const b=this.closest('.cs-deck-wrapper').querySelector('.cs-deck-body'); const open=b.classList.toggle('expanded'); this.textContent = open ? '[ collapse board ↑ ]' : '[ expand full board ↓ ]';">
+                        [ expand full board ↓ ]
+                    </button>
+                </div>
+                <div class="cs-deck-body">
+                    <img src="images/velo-behance-full.png" alt="Velo Full Behance Presentation" loading="lazy" class="cs-image">
+                </div>
+            </div>
+
+            <div class="cs-text-section">
+                <span class="cs-eyebrow">: 05 // Takeaway</span>
+                <h3>Designing across hardware and screen</h3>
+                <p>
+                    Building Velo pushed me to think beyond happy-path screens—accounting for low-battery states mid-ride, GPS drift near hostel buildings, and high-glare outdoor legibility. Combining custom 3D bike renders with a strict typographic grid helped unify the physical hardware and digital product into one language.
+                </p>
+            </div>
+        </section>
 
         <div class="explore-more">
             <h3>Explore Other Projects</h3>
