@@ -424,38 +424,85 @@ function typeAIMessage(text, outputEl) {
 }
 
 function getAIReply(rawQuery) {
-    const q = rawQuery.toLowerCase().trim();
+    const raw = String(rawQuery || '').trim();
+    const q = raw.toLowerCase();
+
+    // 1. Math Solver (handles "2+2", "what is 15 * 4", "(10+5)/3", etc.)
+    const mathClean = q.replace(/what is|what's|whats|calculate|solve|equals|=|\?/g, '').trim();
+    if (/^[0-9+\-*/().\s%^]+$/.test(mathClean) && /[0-9]/.test(mathClean) && /[+\-*/%^]/.test(mathClean)) {
+        try {
+            const safeExpr = mathClean.replace(/\^/g, '**');
+            const result = Function(`"use strict"; return (${safeExpr})`)();
+            if (typeof result === 'number' && isFinite(result)) {
+                const formatted = Number.isInteger(result) ? result : Number(result.toFixed(4));
+                return { text: `; ${mathClean} = ${formatted}. Quick math! Anything else you want to test me on?`, nav: null };
+            }
+        } catch (e) {}
+    }
+
+    // 2. Identity & Name Questions ("what's your name", "who are you")
+    if (q.includes('your name') || q.includes('who are you') || q.includes('what are you') || q === 'orange') {
+        return { text: "; I'm Orange! I'm Sanju's interactive square AI companion—I follow your cursor, blink, and know everything about his work.", nav: null };
+    }
+
+    // 3. Greetings & Small Talk
+    if (/^(hi|hello|hey|yo|sup|hola|namaste)\b/.test(q) || q.includes('how are you') || q.includes('how r u')) {
+        return { text: "; Hey there! Doing great—just floating around the pixel grid. Ask me anything about Sanju, UX, code, math, or anime!", nav: null };
+    }
+
+    // 4. Time, Date & Jokes
+    if (q.includes('time') || q.includes('date') || q.includes('day is it')) {
+        return { text: `: Right now it's ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} on ${new Date().toLocaleDateString()}. Prime hours for shipping good UI.`, nav: null };
+    }
+    if (q.includes('joke') || q.includes('funny')) {
+        return { text: "; Why do UI designers hate nature? Too many bugs and zero Ctrl+Z.", nav: null };
+    }
+
+    // 5. Portfolio & Navigation
     if (q.includes('home') || q.includes('back to work')) {
         return { text: "; Teleporting you back to Sanju's main Work page right now!", nav: 'index.html' };
     }
-    if (q.includes('velo') || q.includes('cycle') || q.includes('mobility')) {
-        return { text: ": Velo is a campus EV cycle and scooter rental platform with real-time tracking, custom 3D branding, and seamless booking. Want me to open the case study?", nav: q.includes('open') || q.includes('show') ? 'velo.html' : null };
+    if (q.includes('velo') || q.includes('cycle') || q.includes('mobility') || q.includes('scooter')) {
+        return {
+            text: ": Velo is a campus EV cycle and scooter mobility app with <15s QR unlock, live dock radar, pause-ride mode, and custom 3D branding.",
+            nav: q.includes('open') || q.includes('show') || q.includes('go') || q.includes('view') ? 'velo.html' : null
+        };
     }
     if (q.includes('workmate') || q.includes('multilingual') || q.includes('workforce')) {
-        return { text: ": WorkMate is a multilingual workforce management app designed to bridge language barriers for daily task management and communication.", nav: q.includes('open') || q.includes('show') ? 'workmate.html' : null };
+        return {
+            text: ": WorkMate is a multilingual workforce app with 1-tap regional language switching and visual checklists that cut supervisor calls by 80%.",
+            nav: q.includes('open') || q.includes('show') || q.includes('go') || q.includes('view') ? 'workmate.html' : null
+        };
     }
-    if (q.includes('esummit') || q.includes('e-summit') || q.includes('iconnect')) {
-        return { text: ": E-Summit '26 is an event platform built to showcase startup culture, innovation, and entrepreneurship.", nav: q.includes('open') || q.includes('show') ? 'esummit.html' : null };
+    if (q.includes('esummit') || q.includes('e-summit') || q.includes('iconnect') || q.includes('summit')) {
+        return {
+            text: ": E-Summit '26 ('Ideas Beyond Boundaries') is the flagship entrepreneurship platform for iConnect with 10+ tracks and <30s registration.",
+            nav: q.includes('open') || q.includes('show') || q.includes('go') || q.includes('view') ? 'esummit.html' : null
+        };
     }
-    if (q.includes('note') || q.includes('wall') || q.includes('doodle')) {
+    if (q.includes('note') || q.includes('wall') || q.includes('doodle') || q.includes('draw')) {
         return { text: "; Taking you to the Notes wall where you can leave a message or drawing!", nav: 'notes.html' };
     }
-    if (q.includes('side quest') || q.includes('3d') || q.includes('webgl') || q.includes('shader') || q.includes('akatsuki')) {
+    if (q.includes('side quest') || q.includes('sidequest') || q.includes('3d') || q.includes('webgl') || q.includes('shader') || q.includes('akatsuki')) {
         return { text: "; Taking you to Side Quests—where the WebGL shaders, Three.js experiments, and creative coding live!", nav: 'sidequest.html' };
     }
-    if (q.includes('stack') || q.includes('tool') || q.includes('skill') || q.includes('code')) {
-        return { text: ": Sanju designs in Figma & Framer, and builds with HTML5, CSS3, Vanilla JS, React, Tailwind CSS, and Three.js / WebGL shaders." };
+    if (q.includes('stack') || q.includes('tool') || q.includes('skill') || q.includes('code') || q.includes('figma')) {
+        return { text: ": Sanju designs in Figma, Framer & Blender 3D, and builds with HTML5, CSS3, Vanilla JS, React, Tailwind CSS, Three.js, and C++." };
     }
-    if (q.includes('hire') || q.includes('intern') || q.includes('contact') || q.includes('email') || q.includes('freelance')) {
+    if (q.includes('hire') || q.includes('intern') || q.includes('contact') || q.includes('email') || q.includes('freelance') || q.includes('resume')) {
         return { text: "; Sanju is open to UI/UX & Product Design internships and collaborations! Reach out directly at isanjukatariya@gmail.com." };
     }
-    if (q.includes('coffee') || q.includes('anime') || q.includes('manga') || q.includes('fun')) {
-        return { text: "; Powered by iced coffee, One Piece, Cowboy Bebop, and manga. Usually overthinking micro-interactions at 2 AM." };
+    if (q.includes('coffee') || q.includes('anime') || q.includes('manga') || q.includes('fun') || q.includes('one piece') || q.includes('chess')) {
+        return { text: "; Powered by iced coffee, chess tactics, One Piece, Cowboy Bebop, and manga. Usually overthinking micro-interactions at 2 AM." };
     }
     if (q.includes('who') || q.includes('about') || q.includes('sanju')) {
-        return { text: ": Sanju Singh is a UI/UX & Product Designer and CSE undergrad ('28) who loves blending clean visual systems with interactive code." };
+        return {
+            text: "; Sanju Singh is a UI/UX & Product Designer and CSE undergrad ('28) at GJUS&T who blends clean visual systems with interactive code.",
+            nav: q.includes('open') || q.includes('go') ? 'about.html' : null
+        };
     }
-    return { text: ": Ask me about Sanju's projects (Velo, WorkMate, E-Summit), his design/tech stack, internship availability, or type 'notes' to visit the wall." };
+
+    return { text: "; I can solve math, chat about design/code/anime, or tell you about Sanju's projects (Velo, WorkMate, E-Summit) and how to hire him!" };
 }
 
 const pageCache = new Map();
