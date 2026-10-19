@@ -672,6 +672,8 @@ function initOrangeAI() {
         }
     }
 
+const chatHistory = []; // ohara 
+
     async function handleQuery(queryText) {
         pauseRedirect();
         const cleanQuery = queryText.trim();
@@ -684,11 +686,19 @@ function initOrangeAI() {
             const res = await fetch('/api/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: cleanQuery, currentPage: window.location.pathname })
+                body: JSON.stringify({
+                    message: cleanQuery,
+                    currentPage: window.location.pathname,
+                    history: chatHistory
+                })
             });
             if (!res.ok) throw new Error('API fallback');
             const data = await res.json();
             if (!data.text || data.text.includes('circuits blinked')) throw new Error('API fallback');
+            
+            chatHistory.push({ role: 'user', text: cleanQuery });
+            chatHistory.push({ role: 'model', text: data.text });
+
             typeAIMessage(data.text, outputEl);
             if (data.nav) setTimeout(() => navigateToPage(data.nav), 1600);
         } catch (err) {
