@@ -2,8 +2,8 @@
   "cleanUrls": true,
   "redirects": [
     {
-      "source": "/(:path+)\\.html",
-      "destination": "/:path+",
+      "source": "/:path*(.html)",
+      "destination": "/:path*",
       "permanent": true
     }
   ]
