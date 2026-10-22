@@ -1315,3 +1315,622 @@ function initMagneticElements() {
 
 initOrangePreloader();
 initMagneticElements();
+
+
+
+
+
+
+(function() {
+    const css = `
+    
+        .custom-cursor .cursor-face {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            overflow: visible !important;
+            pointer-events: none !important;
+            transition: background-color 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+                        box-shadow 0.28s cubic-bezier(0.22, 1, 0.36, 1) !important;
+        }
+        .custom-cursor.cursor-chat {
+            display: inline-flex !important;
+            align-items: center !important;
+        }
+        .custom-cursor.cursor-shape {
+            display: inline-flex !important;
+            align-items: center !important;
+            background: transparent !important;
+            box-shadow: none !important;
+        }
+        .custom-cursor .cursor-eyes-rig {
+            display: none !important;
+        }
+        .custom-cursor.is-angry .cursor-face {
+            background-color: #B82914 !important;
+            box-shadow: 0 0 10px rgba(184, 41, 20, 0.45) !important;
+        }
+        .orange-rig {
+            position: relative !important;
+            width: 16px !important;
+            height: 16px !important;
+            background: transparent !important;
+            border-radius: 0px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            transform-origin: center center !important;
+            will-change: transform !important;
+            pointer-events: none !important;
+            backface-visibility: hidden !important;
+            -webkit-font-smoothing: antialiased !important;
+        }
+        .orange-eye-wrap {
+            position: relative !important;
+            width: 11px !important;
+            height: 9px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            pointer-events: none !important;
+        }
+        .orange-eye {
+            background-color: #FFFFFF !important;
+            border-radius: 0px !important;
+            will-change: transform, width, height, clip-path !important;
+            transform-origin: center center !important;
+            flex-shrink: 0 !important;
+            box-sizing: border-box !important;
+            transition: clip-path 0.14s ease, background-color 0.12s ease, border 0.12s ease !important;
+        }
+        .orange-rig.style-arc .orange-eye {
+            background-color: transparent !important;
+            border-top: 2px solid #FFFFFF !important;
+            border-left: 2px solid #FFFFFF !important;
+        }
+        .orange-rig.style-squish .orange-eye.left {
+            background-color: transparent !important;
+            border-top: 1.8px solid #FFFFFF !important;
+            border-right: 1.8px solid #FFFFFF !important;
+        }
+        .orange-rig.style-squish .orange-eye.right {
+            background-color: transparent !important;
+            border-top: 1.8px solid #FFFFFF !important;
+            border-left: 1.8px solid #FFFFFF !important;
+        }
+        .orange-rig.style-hollow .orange-eye {
+            background-color: transparent !important;
+            border: 1.5px solid #FFFFFF !important;
+        }
+        .orange-rig.style-angry .orange-eye.left {
+            clip-path: polygon(0 0, 100% 42%, 100% 100%, 0 100%) !important;
+        }
+        .orange-rig.style-angry .orange-eye.right {
+            clip-path: polygon(0 42%, 100% 0, 100% 100%, 0 100%) !important;
+        }
+        .orange-cheek {
+            position: absolute !important;
+            bottom: 1.5px !important;
+            width: 3px !important;
+            height: 1.5px !important;
+            background-color: #FFB49A !important;
+            opacity: 0 !important;
+            transform: scale(0.6) !important;
+            transition: opacity 0.22s ease, transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+            pointer-events: none !important;
+        }
+        .orange-cheek.left { left: 0px !important; }
+        .orange-cheek.right { right: 0px !important; }
+        .orange-rig.show-blush .orange-cheek {
+            opacity: 0.95 !important;
+            transform: scale(1) !important;
+        }
+        .orange-emote {
+            position: absolute !important;
+            top: -10px !important;
+            left: -12px !important;
+            right: auto !important;
+            font-family: 'Bricolage Grotesque', monospace, sans-serif !important;
+            font-size: 11px !important;
+            font-weight: 800 !important;
+            line-height: 1 !important;
+            color: #DC5C2C !important;
+            background: transparent !important;
+            padding: 0 !important;
+            border: none !important;
+            box-shadow: none !important;
+            opacity: 0 !important;
+            transform: translate(4px, 4px) scale(0.35) !important;
+            transition: opacity 0.16s ease, transform 0.24s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.2s ease !important;
+            pointer-events: none !important;
+            user-select: none !important;
+            z-index: 25 !important;
+        }
+        .custom-cursor.is-angry .orange-emote {
+            color: #B82914 !important;
+        }
+        .orange-emote.show {
+            opacity: 1 !important;
+            transform: translate(0px, 0px) scale(1) !important;
+        }
+    `;
+
+    function createSpring(initial, stiffness = 0.19, damping = 0.78) {
+        return {
+            val: initial,
+            target: initial,
+            vel: 0,
+            k: stiffness,
+            d: damping,
+            step() {
+                this.vel += (this.target - this.val) * this.k;
+                this.vel *= this.d;
+                this.val += this.vel;
+                return this.val;
+            },
+            impulse(force) {
+                this.vel += force;
+            }
+        };
+    }
+
+    const MOOD_PRESETS = {
+        normal:    { lw: 2.5, lh: 4.2, lrot: 0,   ly: 0,    rw: 2.5, rh: 4.2, rrot: 0,   ry: 0,    blush: false, style: '' },
+        blink:     { lw: 3.6, lh: 0.8, lrot: 0,   ly: 0.2,  rw: 3.6, rh: 0.8, rrot: 0,   ry: 0.2,  blush: false, style: '' },
+        happy:     { lw: 3.8, lh: 3.8, lrot: 45,  ly: 1.0,  rw: 3.8, rh: 3.8, rrot: 45,  ry: 1.0,  blush: true,  style: 'style-arc' },
+        love:      { lw: 4.0, lh: 4.0, lrot: 45,  ly: 0.8,  rw: 4.0, rh: 4.0, rrot: 45,  ry: 0.8,  blush: true,  style: 'style-arc' },
+        curious:   { lw: 3.6, lh: 5.0, lrot: -4,  ly: -0.6, rw: 3.2, rh: 2.0, rrot: 6,   ry: 0.4,  blush: false, style: '' },
+        skeptical: { lw: 3.5, lh: 1.5, lrot: 8,   ly: 0.4,  rw: 3.4, rh: 4.8, rrot: -4,  ry: -0.6, blush: false, style: '' },
+        focus:     { lw: 4.0, lh: 2.0, lrot: 8,   ly: 0.2,  rw: 4.0, rh: 2.0, rrot: -8,  ry: 0.2,  blush: false, style: '' },
+        angry:     { lw: 4.4, lh: 3.2, lrot: 18,  ly: 0.3,  rw: 4.4, rh: 3.2, rrot: -18, ry: 0.3,  blush: false, style: 'style-angry' },
+        shock:     { lw: 4.4, lh: 4.6, lrot: 0,   ly: -0.4, rw: 4.4, rh: 4.6, rrot: 0,   ry: -0.4, blush: false, style: 'style-hollow' },
+        wink:      { lw: 3.8, lh: 1.2, lrot: 8,   ly: 0.3,  rw: 2.8, rh: 4.5, rrot: 0,   ry: -0.3, blush: true,  style: '' },
+        squish:    { lw: 3.6, lh: 3.6, lrot: 45,  ly: 0.2,  rw: 3.6, rh: 3.6, rrot: -45, ry: 0.2,  blush: false, style: 'style-squish' },
+        dizzy:     { lw: 4.0, lh: 1.4, lrot: 38,  ly: -0.4, rw: 4.0, rh: 1.4, rrot: -38, ry: 0.4,  blush: false, style: '' },
+        thinking:  { lw: 3.0, lh: 2.2, lrot: 0,   ly: -1.3, rw: 3.0, rh: 2.2, rrot: 0,   ry: -1.3, blush: false, style: '' },
+        sleep:     { lw: 3.6, lh: 1.0, lrot: 3,   ly: 1.3,  rw: 3.6, rh: 1.0, rrot: -3,  ry: 1.3,  blush: false, style: '' }
+    };
+
+    function bootOrangeSpringEngine() {
+        if (!document.getElementById('orange-spring-styles')) {
+            const style = document.createElement('style');
+            style.id = 'orange-spring-styles';
+            style.textContent = css;
+            document.head.appendChild(style);
+        }
+
+        function mountRig() {
+            ensureCursorFace();
+            const face = document.querySelector('.custom-cursor .cursor-face');
+            if (!face) return null;
+            let rig = document.getElementById('orangeRig');
+            if (!rig) {
+                rig = document.createElement('div');
+                rig.id = 'orangeRig';
+                rig.className = 'orange-rig';
+                rig.innerHTML = `
+                    <div class="orange-eye-wrap">
+                        <div class="orange-eye left" id="orangeEyeL"></div>
+                        <div class="orange-eye right" id="orangeEyeR"></div>
+                    </div>
+                    <div class="orange-cheek left"></div>
+                    <div class="orange-cheek right"></div>
+                    <div class="orange-emote" id="orangeEmote"></div>
+                `;
+                face.appendChild(rig);
+            }
+            return rig;
+        }
+
+        if (!mountRig()) {
+            setTimeout(bootOrangeSpringEngine, 100);
+            return;
+        }
+
+        const sScaleX = createSpring(1, 0.20, 0.78);
+        const sScaleY = createSpring(1, 0.20, 0.78);
+        const sRot    = createSpring(0, 0.16, 0.80);
+        const sBobY   = createSpring(0, 0.15, 0.82);
+
+        const sLookX  = createSpring(0, 0.22, 0.78);
+        const sLookY  = createSpring(0, 0.22, 0.78);
+        const sLookXR = createSpring(0, 0.18, 0.78);
+        const sLookYR = createSpring(0, 0.18, 0.78);
+
+        const sLW   = createSpring(2.5, 0.24, 0.76);
+        const sLH   = createSpring(4.2, 0.24, 0.76);
+        const sLRot = createSpring(0,   0.22, 0.78);
+        const sLY   = createSpring(0,   0.22, 0.78);
+
+        const sRW   = createSpring(2.5, 0.24, 0.76);
+        const sRH   = createSpring(4.2, 0.24, 0.76);
+        const sRRot = createSpring(0,   0.22, 0.78);
+        const sRY   = createSpring(0,   0.22, 0.78);
+
+        let mood = 'normal';
+        let activeStyle = '';
+        let moodTimer = null;
+        let idleTimer = null;
+        let emoteTimer = null;
+        let prevX = window.innerWidth / 2;
+        let prevY = window.innerHeight / 2;
+        let prevScrollY = window.scrollY;
+        let dirChanges = 0;
+        let lastDirX = 0;
+        let petDecayTimer = null;
+        let rapidClicks = 0;
+        let clickResetTimer = null;
+        let backspaceCount = 0;
+        let lastObservedText = '';
+        let settleTimer = null;
+        let t = 0;
+
+        function showEmote(char, ms = 1000) {
+            const emote = document.getElementById('orangeEmote');
+            if (!emote) return;
+            emote.textContent = char;
+            emote.classList.add('show');
+            clearTimeout(emoteTimer);
+            emoteTimer = setTimeout(() => emote.classList.remove('show'), ms);
+        }
+
+        function applyPreset(name) {
+            const rig = document.getElementById('orangeRig');
+            const cursorEl = document.querySelector('.custom-cursor');
+            const p = MOOD_PRESETS[name] || MOOD_PRESETS.normal;
+            sLW.target = p.lw;
+            sLH.target = p.lh;
+            sLRot.target = p.lrot;
+            sLY.target = p.ly;
+            sRW.target = p.rw;
+            sRH.target = p.rh;
+            sRRot.target = p.rrot;
+            sRY.target = p.ry;
+            activeStyle = p.style || '';
+            if (rig) {
+                rig.className = `orange-rig ${activeStyle} ${p.blush ? 'show-blush' : ''}`.trim();
+            }
+            if (cursorEl) {
+                cursorEl.classList.toggle('is-angry', name === 'angry');
+            }
+        }
+
+        function setMood(newMood, duration = 0, emoteChar = '') {
+            const mapped = newMood === 'squint' ? 'squish' : (newMood || 'normal');
+            mood = mapped;
+            applyPreset(mapped);
+            if (emoteChar) showEmote(emoteChar, duration || 1100);
+            clearTimeout(moodTimer);
+            if (duration > 0) {
+                moodTimer = setTimeout(() => {
+                    if (mood === mapped) setMood('normal');
+                }, duration);
+            }
+        }
+
+        window.setOrangeExpression = setMood;
+        const origSetCursorMood = window.setCursorMood;
+        window.setCursorMood = function(m, dur = 0) {
+            if (typeof origSetCursorMood === 'function') origSetCursorMood(m, dur);
+            if (mood === 'angry') return;
+            setMood(m || 'normal', dur);
+        };
+
+        function triggerBlink(doubleBlink = false) {
+            if (mood === 'sleep' || mood === 'thinking' || mood === 'angry') return;
+            const savedMood = mood;
+            applyPreset('blink');
+            setTimeout(() => {
+                applyPreset(savedMood);
+                if (doubleBlink) {
+                    setTimeout(() => {
+                        applyPreset('blink');
+                        setTimeout(() => applyPreset(savedMood), 90);
+                    }, 100);
+                }
+            }, 90);
+        }
+
+        setInterval(() => {
+            if (mood !== 'normal' || !hasStartedMoving || !isMouseActive) return;
+            const r = Math.random();
+            if (r < 0.64) {
+                triggerBlink(Math.random() < 0.35);
+            } else if (r < 0.82) {
+                const dartX = (Math.random() - 0.5) * 4.2;
+                const dartY = (Math.random() - 0.5) * 2.8;
+                sLookX.target = dartX;
+                sLookXR.target = dartX;
+                sLookY.target = dartY;
+                sLookYR.target = dartY;
+                setTimeout(() => {
+                    sLookX.target = 0;
+                    sLookXR.target = 0;
+                    sLookY.target = 0;
+                    sLookYR.target = 0;
+                }, 520);
+            } else if (r < 0.92) {
+                setMood('wink', 480);
+                sRot.impulse(4);
+            } else {
+                setMood('skeptical', 700);
+                sRot.target = -5;
+                setTimeout(() => { sRot.target = 0; }, 700);
+            }
+        }, 2800);
+
+        window.addEventListener('mousemove', (e) => {
+            const dx = e.clientX - prevX;
+            const dy = e.clientY - prevY;
+            prevX = e.clientX;
+            prevY = e.clientY;
+            const speed = Math.hypot(dx, dy);
+
+            if (mood === 'sleep') {
+                setMood('happy', 900, '!');
+                sScaleX.impulse(0.20);
+                sScaleY.impulse(-0.16);
+            }
+
+            const lx = Math.max(-3.0, Math.min(3.0, dx * 0.20));
+            const ly = Math.max(-2.6, Math.min(2.6, dy * 0.20));
+            sLookX.target = lx;
+            sLookY.target = ly;
+            sLookXR.target = lx;
+            sLookYR.target = ly;
+
+            const curDirX = Math.sign(dx);
+            if (curDirX !== 0 && curDirX !== lastDirX && speed > 3 && speed < 42) {
+                dirChanges++;
+                lastDirX = curDirX;
+                clearTimeout(petDecayTimer);
+                petDecayTimer = setTimeout(() => { dirChanges = 0; }, 750);
+                if (dirChanges >= 4 && mood !== 'love' && mood !== 'angry') {
+                    dirChanges = 0;
+                    setMood('love', 1600, '♥');
+                    showCursorSpeech('; purr... that feels nice!', 1500, ';');
+                    sScaleX.impulse(0.22);
+                    sScaleY.impulse(0.22);
+                }
+            }
+
+            if (speed > 125 && mood !== 'thinking' && mood !== 'speaking' && mood !== 'angry') {
+                setMood('dizzy', 950, '@');
+                sRot.impulse(dx > 0 ? 12 : -12);
+            }
+
+            clearTimeout(idleTimer);
+            idleTimer = setTimeout(() => {
+                if (mood === 'normal' && hasStartedMoving && isMouseActive) {
+                    setMood('sleep', 0, 'zZz');
+                }
+            }, 7000);
+        });
+
+        window.addEventListener('scroll', () => {
+            const sy = window.scrollY;
+            const sDelta = sy - prevScrollY;
+            prevScrollY = sy;
+            if (Math.abs(sDelta) > 18 && mood === 'normal' && hasStartedMoving) {
+                setMood('squish', 220);
+                sScaleY.impulse(Math.min(0.22, Math.abs(sDelta) * 0.0035));
+                sScaleX.impulse(-Math.min(0.14, Math.abs(sDelta) * 0.0025));
+                sLookY.target = Math.max(-2.6, Math.min(2.6, sDelta * 0.08));
+                sLookYR.target = sLookY.target;
+            }
+        }, { passive: true });
+
+        window.addEventListener('mousedown', (e) => {
+            const isInteractive = e.target.closest('a, button, input, textarea, select, canvas, .frame-31, .orange-ai-wrapper, .project-card, .note-composer-box, .lost-card');
+            if (!isInteractive) {
+                rapidClicks++;
+                clearTimeout(clickResetTimer);
+                clickResetTimer = setTimeout(() => { rapidClicks = 0; }, 900);
+
+                if (rapidClicks >= 4) {
+                    rapidClicks = 0;
+                    setMood('angry', 2200, '#');
+                    sScaleX.impulse(0.36);
+                    sScaleY.impulse(0.36);
+                    showCursorSpeech(': HEY! Stop poking me!!', 2000, 'angry');
+                    return;
+                }
+            }
+
+            sScaleX.impulse(0.28);
+            sScaleY.impulse(-0.22);
+            if (mood !== 'thinking' && mood !== 'speaking' && mood !== 'angry') {
+                setMood('squish', 220);
+            }
+        });
+
+        window.addEventListener('dblclick', (e) => {
+            if (mood === 'angry' || e.target.closest('a, button, input, textarea')) return;
+            setMood('love', 1100, '✦');
+            sRot.val = 0;
+            sRot.impulse(52);
+            sBobY.impulse(-4.5);
+            impulseCursorScale(1.22, 0.80);
+            showCursorSpeech('; 360 kickflip!!', 1400, ';');
+        });
+
+        window.addEventListener('keydown', (e) => {
+            const active = document.activeElement;
+            if (e.key === 'Backspace') {
+                backspaceCount++;
+                setTimeout(() => { backspaceCount = Math.max(0, backspaceCount - 1); }, 1200);
+                if (backspaceCount >= 5) {
+                    backspaceCount = 0;
+                    setMood('angry', 1800, '#');
+                    showCursorSpeech(': aggressive deleting!!', 1600, 'angry');
+                    return;
+                }
+            }
+            if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA')) {
+                const val = (active.value || '').toLowerCase();
+                if (/\b(angry|mad|hate|stupid|bad|ugly|dumb|annoying)\b/.test(val)) {
+                    setMood('angry', 2000, '#');
+                    return;
+                }
+                if (mood !== 'angry') setMood('focus', 850);
+                sBobY.impulse(-1.2);
+                const sweep = ((active.value?.length || 0) % 18) / 18 * 4.6 - 2.3;
+                sLookX.target = sweep;
+                sLookXR.target = sweep;
+            }
+        });
+
+        document.addEventListener('mouseover', (e) => {
+            if (mood === 'thinking' || mood === 'speaking' || mood === 'angry') return;
+            if (e.target.closest('.project-card, .cs-image, .cs-deck-wrapper')) {
+                setMood('curious', 0, '?');
+                sRot.target = -6;
+            } else if (e.target.closest('a, button, .nav-tab, .ai-chip, #openComposerBtn')) {
+                setMood('happy');
+                sScaleY.impulse(0.16);
+                sScaleX.impulse(-0.10);
+            } else if (e.target.closest('input, textarea')) {
+                setMood('focus');
+            }
+        });
+
+        document.addEventListener('mouseout', (e) => {
+            if (mood === 'thinking' || mood === 'speaking' || mood === 'angry') return;
+            if (e.target.closest('a, button, .project-card, .cs-image, .cs-deck-wrapper, .nav-tab, .ai-chip, #openComposerBtn, input, textarea')) {
+                setMood('normal');
+                sRot.target = 0;
+            }
+        });
+
+        function tick() {
+            t += 0.075;
+            const rig = mountRig();
+            const eyeL = document.getElementById('orangeEyeL');
+            const eyeR = document.getElementById('orangeEyeR');
+            const cursorEl = document.querySelector('.custom-cursor');
+            const isDocked = !hasStartedMoving || !isMouseActive;
+            const isChatting = cursorEl && cursorEl.classList.contains('cursor-chat');
+
+            if (cursorEl) {
+                cursorEl.style.setProperty('--face-x', '0px');
+                cursorEl.style.setProperty('--face-y', '0px');
+            }
+
+            const aiOut = document.querySelector('.ai-output');
+            if (aiOut) {
+                const txt = aiOut.textContent.trim();
+                if (txt !== lastObservedText) {
+                    lastObservedText = txt;
+                    if (txt.includes('thinking...')) {
+                        setMood('thinking', 0, '...');
+                    } else if (txt.length > 0 && mood !== 'angry') {
+                        mood = 'speaking';
+                        applyPreset('normal');
+                        sScaleY.impulse((Math.random() * 0.20) - 0.07);
+                        sScaleX.impulse((Math.random() * 0.14) - 0.07);
+                        sLH.target = 1.8 + Math.random() * 2.6;
+                        sRH.target = 1.8 + Math.random() * 2.6;
+                        clearTimeout(settleTimer);
+                        settleTimer = setTimeout(() => {
+                            setMood(txt.startsWith(':') ? 'focus' : 'happy', 2200, '!');
+                        }, 140);
+                    }
+                }
+            }
+
+            // Force scale and rotation back to absolute square proportions when docked
+            if (isDocked) {
+                sScaleX.target = 1;
+                sScaleY.target = 1;
+                sScaleX.val = 1;
+                sScaleY.val = 1;
+                sScaleX.vel = 0;
+                sScaleY.vel = 0;
+                sRot.target = 0;
+                sRot.val = 0;
+                sRot.vel = 0;
+                sBobY.target = 0;
+                sBobY.val = 0;
+                sBobY.vel = 0;
+            } else {
+                sScaleX.target += (1 - sScaleX.target) * 0.25;
+                sScaleY.target += (1 - sScaleY.target) * 0.25;
+                if (mood === 'normal') {
+                    sRot.target *= 0.85;
+                }
+            }
+
+            sLookX.target *= 0.86;
+            sLookY.target *= 0.86;
+            sLookXR.target *= 0.86;
+            sLookYR.target *= 0.86;
+
+            if (!isDocked) {
+                if (mood === 'thinking') {
+                    const scan = Math.sin(t * 2.6) * 2.8;
+                    sLookX.target = scan;
+                    sLookXR.target = scan;
+                    sLookY.target = -1.0;
+                    sLookYR.target = -1.0;
+                    sBobY.target = isChatting ? 0 : Math.sin(t * 3.0) * -1.6;
+                } else if (mood === 'angry') {
+                    sBobY.target = isChatting ? 0 : Math.sin(t * 14) * 0.9;
+                    sRot.target = Math.cos(t * 16) * 4.5;
+                    sScaleX.target = 1.08;
+                    sScaleY.target = 0.94;
+                } else if (mood === 'sleep') {
+                    sBobY.target = isChatting ? 0 : Math.sin(t * 0.5) * 1.0 + 1.0;
+                    sScaleX.target = 1.04 + Math.sin(t * 0.5) * 0.025;
+                    sScaleY.target = 0.94 - Math.sin(t * 0.5) * 0.025;
+                    if (Math.sin(t * 0.5) > 0.97) showEmote('zZz', 700);
+                } else {
+                    sBobY.target = isChatting ? 0 : Math.sin(t * 1.1) * -0.55;
+                }
+            }
+
+            const sx = sScaleX.step();
+            const sy = sScaleY.step();
+            const rt = sRot.step();
+            const by = sBobY.step();
+
+            const lx = sLookX.step();
+            const ly = sLookY.step();
+            const rx = sLookXR.step();
+            const ry = sLookYR.step();
+
+            const lw = Math.max(1, sLW.step());
+            const lh = Math.max(0.8, sLH.step());
+            const lrot = sLRot.step();
+            const lOffsetY = sLY.step();
+
+            const rw = Math.max(1, sRW.step());
+            const rh = Math.max(0.8, sRH.step());
+            const rrot = sRRot.step();
+            const rOffsetY = sRY.step();
+
+            if (rig) {
+                rig.style.transform = `translate3d(0, ${by.toFixed(2)}px, 0) rotate(${rt.toFixed(2)}deg) scale(${sx.toFixed(3)}, ${sy.toFixed(3)})`;
+            }
+
+            if (eyeL && eyeR) {
+                eyeL.style.width = `${lw.toFixed(2)}px`;
+                eyeL.style.height = `${lh.toFixed(2)}px`;
+                eyeL.style.transform = `translate3d(${lx.toFixed(2)}px, ${(ly + lOffsetY).toFixed(2)}px, 0) rotate(${lrot.toFixed(1)}deg)`;
+
+                eyeR.style.width = `${rw.toFixed(2)}px`;
+                eyeR.style.height = `${rh.toFixed(2)}px`;
+                eyeR.style.transform = `translate3d(${rx.toFixed(2)}px, ${(ry + rOffsetY).toFixed(2)}px, 0) rotate(${rrot.toFixed(1)}deg)`;
+            }
+
+            requestAnimationFrame(tick);
+        }
+
+        requestAnimationFrame(tick);
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', bootOrangeSpringEngine);
+    } else {
+        bootOrangeSpringEngine();
+    }
+})();
