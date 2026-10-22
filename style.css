@@ -1801,6 +1801,11 @@ html.lenis, html.lenis body {
 }
 
 @media (max-width: 768px) {
+  .custom-cursor {
+        display: none !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+    }
   .cs-split-grid,
   .cs-feature-grid {
     grid-template-columns: 1fr;
@@ -1815,4 +1820,170 @@ html.lenis, html.lenis body {
   .cs-deck-wrapper {
     padding: 14px;
   }
+}
+
+
+
+
+
+
+
+
+/* ==========================================================================
+   ORANGE 2.0: MAGNETIC BENTO CORE & EXPRESSION ENGINE
+   ========================================================================== */
+#cursor-face {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  width: 20px !important;
+  height: 20px !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  will-change: transform;
+}
+
+/* Hide legacy single-square eyes if any */
+#cursor-face > .eye:not(.bento-eye) {
+  display: none !important;
+}
+
+.bento-core {
+  position: relative;
+  width: 18px;
+  height: 18px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 2px;
+  transition: gap 0.22s cubic-bezier(0.16, 1, 0.3, 1), transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.bento-tile {
+  background-color: #DC5C2C;
+  width: 100%;
+  height: 100%;
+  border-radius: 0px !important;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease, opacity 0.2s ease;
+  will-change: transform;
+}
+
+/* Make the top-left tile an accent shade on hover/active for true Bento hierarchy */
+.bento-core.state-focus .bento-tile.t1,
+.bento-core.state-speaking .bento-tile.t4 {
+  background-color: #18222D;
+}
+
+/* Central Expression Visor */
+.bento-visor {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  z-index: 2;
+  pointer-events: none;
+  transition: transform 0.12s ease-out;
+}
+
+.bento-eye {
+  width: 2.5px;
+  height: 4px;
+  background-color: #FFFFFF;
+  border-radius: 0px !important;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.25);
+}
+
+/* --- EMOTION 1: BLINKING --- */
+.bento-core.is-blinking .bento-eye {
+  height: 1px !important;
+  transform: scaleX(1.2);
+}
+
+/* --- EMOTION 2: HAPPY / WITTY (;) --- */
+.bento-core.state-happy {
+  gap: 3px;
+}
+.bento-core.state-happy .bento-tile.t1 { transform: translate(-1px, -2px); }
+.bento-core.state-happy .bento-tile.t2 { transform: translate(1px, -2px); }
+.bento-core.state-happy .bento-eye {
+  width: 4px;
+  height: 2px;
+  background: transparent;
+  border-top: 2px solid #FFFFFF;
+  border-left: 2px solid #FFFFFF;
+  transform: rotate(45deg) translateY(1px);
+  box-shadow: none;
+}
+
+/* --- EMOTION 3: ANALYTICAL / FOCUS (:) --- */
+.bento-core.state-focus {
+  gap: 1px;
+}
+.bento-core.state-focus .bento-eye {
+  width: 4px;
+  height: 2px;
+}
+
+/* --- EMOTION 4: THINKING (Bento Orbit Shift) --- */
+.bento-core.state-thinking {
+  gap: 4px;
+  animation: bentoSpin 1.1s infinite cubic-bezier(0.65, 0, 0.35, 1);
+}
+.bento-core.state-thinking .bento-tile.t1 { animation: tilePulse 0.55s infinite alternate; }
+.bento-core.state-thinking .bento-tile.t4 { animation: tilePulse 0.55s 0.25s infinite alternate; }
+.bento-core.state-thinking .bento-eye {
+  width: 2.5px;
+  height: 2.5px;
+}
+
+/* --- EMOTION 5: SPEAKING (Audio-Reactive Bento) --- */
+.bento-core.state-speaking.beat-odd {
+  gap: 4.5px;
+  transform: scale(1.1);
+}
+.bento-core.state-speaking.beat-even {
+  gap: 1.5px;
+  transform: scale(0.95);
+}
+
+/* --- EMOTION 6: DIZZY / SHAKEN --- */
+.bento-core.state-dizzy {
+  gap: 5px;
+}
+.bento-core.state-dizzy .bento-tile.t1 { transform: translate(-3px, -2px) rotate(-14deg); }
+.bento-core.state-dizzy .bento-tile.t2 { transform: translate(3px, -3px) rotate(18deg); }
+.bento-core.state-dizzy .bento-tile.t3 { transform: translate(-2px, 3px) rotate(12deg); }
+.bento-core.state-dizzy .bento-tile.t4 { transform: translate(3px, 2px) rotate(-16deg); }
+.bento-core.state-dizzy .bento-eye {
+  width: 4px;
+  height: 1.5px;
+  transform: rotate(45deg);
+}
+
+/* --- EMOTION 7: SLEEPING (Idle > 8s) --- */
+.bento-core.state-sleep {
+  gap: 1px;
+  opacity: 0.75;
+  transform: translateY(2px) scaleY(0.9);
+}
+.bento-core.state-sleep .bento-eye {
+  width: 4px;
+  height: 1px;
+  opacity: 0.85;
+}
+
+@keyframes bentoSpin {
+  0% { transform: rotate(0deg); }
+  50% { transform: rotate(90deg) scale(1.08); }
+  100% { transform: rotate(180deg); }
+}
+
+@keyframes tilePulse {
+  from { transform: scale(0.75); opacity: 0.65; }
+  to { transform: scale(1.15); opacity: 1; }
 }
