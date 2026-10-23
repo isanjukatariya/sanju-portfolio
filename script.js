@@ -1934,3 +1934,130 @@ initMagneticElements();
         bootOrangeSpringEngine();
     }
 })();
+
+
+
+(function() {
+    const headerCss = `
+        .frame-3 {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            gap: 8px !important;
+        }
+        .top-ist-status {
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 6px !important;
+            white-space: nowrap !important;
+            font-variant-numeric: tabular-nums !important;
+            cursor: pointer !important;
+            transition: color 0.2s ease !important;
+            line-height: 1 !important;
+        }
+        .top-ist-dot {
+            width: 6px !important;
+            height: 6px !important;
+            background-color: #DC5C2C !important;
+            border-radius: 0px !important;
+            display: inline-block !important;
+            flex-shrink: 0 !important;
+            animation: statusPulse 2.2s infinite ease-in-out !important;
+        }
+        @keyframes statusPulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.85); }
+        }
+        @media (max-width: 640px) {
+            .top-ist-status {
+                font-size: 12px !important;
+                letter-spacing: -0.01em !important;
+            }
+            .top-ist-status .desk-only {
+                display: none !important;
+            }
+        }
+    `;
+
+    function injectHeaderStyles() {
+        if (!document.getElementById('ist-header-styles')) {
+            const st = document.createElement('style');
+            st.id = 'ist-header-styles';
+            st.textContent = headerCss;
+            document.head.appendChild(st);
+        }
+    }
+
+    
+
+    function copySanjuEmail() {
+        const email = 'isanjukatariya@gmail.com';
+        navigator.clipboard.writeText(email).then(() => {
+            if (typeof window.setOrangeExpression === 'function') {
+                window.setOrangeExpression('love', 1600, '✓');
+            }
+            if (typeof showCursorSpeech === 'function') {
+                showCursorSpeech('; copied isanjukatariya@gmail.com!', 2200, ';');
+            }
+            const headerStatus = document.querySelector('.top-ist-status');
+            if (headerStatus) {
+                headerStatus.dataset.copied = 'true';
+                const isMobile = window.innerWidth <= 640;
+                headerStatus.innerHTML = `<span class="top-ist-dot"></span><span>${isMobile ? 'Copied email ✓' : 'Copied: isanjukatariya@gmail.com ✓'}</span>`;
+                headerStatus.style.color = '#DC5C2C';
+                setTimeout(() => {
+                    headerStatus.dataset.copied = 'false';
+                    headerStatus.style.color = '';
+                    updateHeaderClock();
+                }, 2200);
+            }
+        });
+    }
+
+    function updateHeaderClock() {
+        injectHeaderStyles();
+        const topBar = document.querySelector('.frame-3');
+        if (!topBar) return;
+
+        let rightEl = topBar.querySelector('.top-ist-status') || topBar.querySelector('.frame-2') || topBar.querySelector('.roles');
+
+        if (!rightEl) {
+            rightEl = document.createElement('div');
+            rightEl.className = 'frame-2 top-ist-status roles';
+            topBar.appendChild(rightEl);
+        } else {
+            rightEl.classList.add('top-ist-status', 'roles');
+        }
+
+        rightEl.setAttribute('data-message', '; press [C] or click to copy email');
+
+        if (rightEl.dataset.boundClick !== 'true') {
+            rightEl.dataset.boundClick = 'true';
+            rightEl.addEventListener('click', copySanjuEmail);
+        }
+
+        if (rightEl.dataset.copied === 'true') return;
+
+        const now = new Date().toLocaleTimeString('en-US', {
+            timeZone: 'Asia/Kolkata',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+        });
+
+        rightEl.innerHTML = `<span class="top-ist-dot"></span><span>IST ${now}</span><span class="desk-only">• Available for Internships</span>`;
+    }
+
+    document.addEventListener('keydown', (e) => {
+        const tag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
+        if (tag === 'input' || tag === 'textarea' || e.metaKey || e.ctrlKey || e.altKey) return;
+        if (e.key.toLowerCase() === 'c') {
+            copySanjuEmail();
+        }
+    });
+
+    updateHeaderClock();
+    setInterval(updateHeaderClock, 10000);
+    window.addEventListener('popstate', () => setTimeout(updateHeaderClock, 80));
+    document.addEventListener('click', () => setTimeout(updateHeaderClock, 120));
+})();
