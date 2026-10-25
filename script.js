@@ -216,9 +216,6 @@ document.addEventListener('mousemove', (e) => {
     mouseY = e.clientY;
     updateNameColor(true);
 
-    sessionStorage.setItem('cursorX', mouseX);
-    sessionStorage.setItem('cursorY', mouseY);
-
     if (firstMove && !hasGreeted) {
         hasGreeted = true;
         sessionStorage.setItem('cursorGreeted', 'true');
@@ -238,13 +235,7 @@ document.addEventListener('mousemove', (e) => {
     resetIdleTimer();
 });
 
-let lastScrollY = window.scrollY;
-window.addEventListener('scroll', () => {
-    if (!cursor || !isMouseActive) return;
-    const scrollDelta = window.scrollY - lastScrollY;
-    lastScrollY = window.scrollY;
-    eyeVelY += Math.max(-3.5, Math.min(3.5, scrollDelta * 0.12));
-}, { passive: true });
+
 
 document.addEventListener('mouseleave', (e) => {
     if (e.clientY <= 0 || e.clientX <= 0 || (e.clientX >= window.innerWidth || e.clientY >= window.innerHeight)) {
@@ -336,7 +327,7 @@ document.addEventListener('mouseout', (e) => {
 
 function animate() {
     if (cursor) {
-        ensureCursorFace();
+        
         let targetX = mouseX;
         let targetY = mouseY;
 
@@ -353,8 +344,8 @@ function animate() {
             targetY += (centerY - mouseY) * 0.18;
         }
 
-        const stiffness = 0.42;
-        const damping = 0.58;
+        const stiffness = 0.52;
+        const damping = 0.50;
         velX = (velX + (targetX - cursorX) * stiffness) * damping;
         velY = (velY + (targetY - cursorY) * stiffness) * damping;
         cursorX += velX;
@@ -783,7 +774,7 @@ const chatHistory = []; // ohara
 }
 
 let hasDrawnDoodle = false;
-let doodleStrokeColor = '#A769F7';
+let doodleStrokeColor = '#DC5C2C';
 let doodleHistory = [];
 let memoryNotesCache = null;
 let notesFetchPromise = null;
@@ -865,12 +856,7 @@ function initNotesWall() {
     if (!canvas) return;
     loadAllNotes();
 
-    document.querySelectorAll('.color-swatch').forEach(swatch => {
-        if (swatch.getAttribute('data-color') === '#DC5C2C') {
-            swatch.setAttribute('data-color', '#A769F7');
-            swatch.style.backgroundColor = '#A769F7';
-        }
-    });
+    
 
     if (canvas.dataset.bound === 'true') return;
     canvas.dataset.bound = 'true';
@@ -964,12 +950,9 @@ document.addEventListener('click', async (e) => {
 
     if (e.target.closest('#closeComposer')) {
         const composer = document.getElementById('noteComposer');
-        const btn = document.getElementById('openComposerBtn');
-        if (composer) composer.classList.remove('open');
-        if (composer) composer.classList.remove('open');
         const openBtn = document.getElementById('openComposerBtn');
+        if (composer) composer.classList.remove('open');
         if (openBtn) openBtn.textContent = '+ New note';
-        if (btn) btn.textContent = '+ New note';
         return;
     }
     if (e.target.closest('#toggleDoodleBtn')) {
@@ -1194,7 +1177,7 @@ function initInteractivePolish() {
             navigator.clipboard.writeText(email).then(() => {
                 const originalText = emailLink.textContent;
                 emailLink.textContent = 'copied: isanjukatariya@gmail.com ✓';
-                emailLink.style.color = '#A769F7';
+                emailLink.style.color = '#DC5C2C';
                 showCursorSpeech('; email copied to clipboard!', 2400, ';');
                 impulseCursorScale(1.3, 0.75);
                 setTimeout(() => {
