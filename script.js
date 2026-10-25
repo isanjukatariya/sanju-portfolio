@@ -186,7 +186,7 @@ function resetIdleTimer() {
     }
     idleTimeout = setTimeout(() => {
         if (isMouseActive && !activeMsgTarget) {
-            showCursorSpeech("zzz... press / to wake me up", 2800, 'sleep');
+            
             if (cursor) cursor.classList.add('mood-sleep');
         }
     }, 8500);
@@ -317,7 +317,7 @@ document.addEventListener('mouseover', (e) => {
             cursor.classList.add('cursor-link');
             impulseCursorScale(1.12, 0.9);
         } else if (isText) {
-            cursor.classList.add('cursor-text');
+            //stat square
         }
     }
 });
@@ -353,8 +353,8 @@ function animate() {
             targetY += (centerY - mouseY) * 0.18;
         }
 
-        const stiffness = 0.26;
-        const damping = 0.68;
+        const stiffness = 0.42;
+        const damping = 0.58;
         velX = (velX + (targetX - cursorX) * stiffness) * damping;
         velY = (velY + (targetY - cursorY) * stiffness) * damping;
         cursorX += velX;
@@ -1318,26 +1318,50 @@ initMagneticElements();
 
 
 
-
-
-
 (function() {
     const css = `
-    
+        @media (hover: none) and (pointer: coarse), (max-width: 768px) {
+            .custom-cursor {
+                display: none !important;
+                opacity: 0 !important;
+                visibility: hidden !important;
+            }
+        }
+        .custom-cursor,
+        .custom-cursor.cursor-text {
+            width: 16px !important;
+            height: 16px !important;
+        }
+        .custom-cursor.cursor-text .cursor-shape {
+            width: 16px !important;
+            height: 16px !important;
+            border-radius: 0px !important;
+        }
         .custom-cursor .cursor-face {
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
             overflow: visible !important;
             pointer-events: none !important;
+            opacity: 1 !important;
+            visibility: visible !important;
             transition: background-color 0.28s cubic-bezier(0.22, 1, 0.36, 1),
                         box-shadow 0.28s cubic-bezier(0.22, 1, 0.36, 1) !important;
+        }
+        .custom-cursor.is-docked,
+        .custom-cursor.is-docked .cursor-shape,
+        .custom-cursor.is-docked .cursor-face {
+            --scale-x: 1 !important;
+            --scale-y: 1 !important;
+            --rotate: 0deg !important;
+            width: 16px !important;
+            height: 16px !important;
         }
         .custom-cursor.cursor-chat {
             display: inline-flex !important;
             align-items: center !important;
         }
-        .custom-cursor.cursor-shape {
+        .custom-cursor.cursor-chat .cursor-shape {
             display: inline-flex !important;
             align-items: center !important;
             background: transparent !important;
@@ -1427,11 +1451,11 @@ initMagneticElements();
         }
         .orange-emote {
             position: absolute !important;
-            top: -10px !important;
-            left: -12px !important;
+            top: -9px !important;
+            left: -15px !important;
             right: auto !important;
             font-family: 'Bricolage Grotesque', monospace, sans-serif !important;
-            font-size: 11px !important;
+            font-size: 10px !important;
             font-weight: 800 !important;
             line-height: 1 !important;
             color: #DC5C2C !important;
@@ -1452,6 +1476,58 @@ initMagneticElements();
         .orange-emote.show {
             opacity: 1 !important;
             transform: translate(0px, 0px) scale(1) !important;
+        }
+        .frame-3 {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            gap: 8px !important;
+        }
+        .top-ist-status {
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 6px !important;
+            white-space: nowrap !important;
+            font-variant-numeric: tabular-nums !important;
+            cursor: pointer !important;
+            transition: color 0.2s ease !important;
+            line-height: 1 !important;
+        }
+        .top-ist-dot {
+            width: 6px !important;
+            height: 6px !important;
+            background-color: #DC5C2C !important;
+            border-radius: 0px !important;
+            display: inline-block !important;
+            flex-shrink: 0 !important;
+            animation: statusPulse 2.2s infinite ease-in-out !important;
+        }
+        @keyframes statusPulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.85); }
+        }
+        @media (max-width: 640px) {
+            .top-ist-status {
+                font-size: 12px !important;
+                letter-spacing: -0.01em !important;
+            }
+            .top-ist-status .desk-only {
+                display: none !important;
+            }
+        }
+        body.blueprint-xray * {
+            outline: 1px dashed rgba(220, 92, 44, 0.38) !important;
+        }
+        body.blueprint-xray .project-card,
+        body.blueprint-xray .cs-image,
+        body.blueprint-xray .note-card,
+        body.blueprint-xray .nav-bar,
+        body.blueprint-xray .frame-3 {
+            outline: 1px solid #DC5C2C !important;
+            background-color: rgba(220, 92, 44, 0.03) !important;
+        }
+        body.blueprint-xray img {
+            filter: grayscale(100%) contrast(1.1) opacity(0.82) !important;
         }
     `;
 
@@ -1488,10 +1564,10 @@ initMagneticElements();
         squish:    { lw: 3.6, lh: 3.6, lrot: 45,  ly: 0.2,  rw: 3.6, rh: 3.6, rrot: -45, ry: 0.2,  blush: false, style: 'style-squish' },
         dizzy:     { lw: 4.0, lh: 1.4, lrot: 38,  ly: -0.4, rw: 4.0, rh: 1.4, rrot: -38, ry: 0.4,  blush: false, style: '' },
         thinking:  { lw: 3.0, lh: 2.2, lrot: 0,   ly: -1.3, rw: 3.0, rh: 2.2, rrot: 0,   ry: -1.3, blush: false, style: '' },
-        sleep:     { lw: 3.6, lh: 1.0, lrot: 3,   ly: 1.3,  rw: 3.6, rh: 1.0, rrot: -3,  ry: 1.3,  blush: false, style: '' }
+        sleep:     { lw: 3.6, lh: 1.0, lrot: 0,   ly: 0.8,  rw: 3.6, rh: 1.0, rrot: 0,   ry: 0.8,  blush: false, style: '' }
     };
 
-    function bootOrangeSpringEngine() {
+    function bootUnifiedOrangeSystem() {
         if (!document.getElementById('orange-spring-styles')) {
             const style = document.createElement('style');
             style.id = 'orange-spring-styles';
@@ -1523,7 +1599,7 @@ initMagneticElements();
         }
 
         if (!mountRig()) {
-            setTimeout(bootOrangeSpringEngine, 100);
+            setTimeout(bootUnifiedOrangeSystem, 100);
             return;
         }
 
@@ -1563,6 +1639,7 @@ initMagneticElements();
         let backspaceCount = 0;
         let lastObservedText = '';
         let settleTimer = null;
+        let isPeekingEdge = false;
         let t = 0;
 
         function showEmote(char, ms = 1000) {
@@ -1650,7 +1727,7 @@ initMagneticElements();
                     sLookYR.target = 0;
                 }, 520);
             } else if (r < 0.92) {
-                setMood('wink', 480);
+                setMood('wink', 480, '✦');
                 sRot.impulse(4);
             } else {
                 setMood('skeptical', 700);
@@ -1658,6 +1735,27 @@ initMagneticElements();
                 setTimeout(() => { sRot.target = 0; }, 700);
             }
         }, 2800);
+
+        document.addEventListener('mouseleave', () => {
+            targetScaleX = 1;
+            targetScaleY = 1;
+            scaleX = 1;
+            scaleY = 1;
+            scaleVelX = 0;
+            scaleVelY = 0;
+            setMood('sleep', 0, 'zZz');
+        });
+
+        document.addEventListener('selectionchange', () => {
+            const sel = window.getSelection();
+            const selectedText = sel ? sel.toString().trim() : '';
+            if (selectedText.length > 2 && mood !== 'angry' && mood !== 'thinking') {
+                setMood('focus', 1100);
+                const sweep = ((selectedText.length % 12) / 12) * 4.4 - 2.2;
+                sLookX.target = sweep;
+                sLookXR.target = sweep;
+            }
+        });
 
         window.addEventListener('mousemove', (e) => {
             const dx = e.clientX - prevX;
@@ -1667,7 +1765,7 @@ initMagneticElements();
             const speed = Math.hypot(dx, dy);
 
             if (mood === 'sleep') {
-                setMood('happy', 900, '!');
+                setMood('happy', 900, '✦');
                 sScaleX.impulse(0.20);
                 sScaleY.impulse(-0.16);
             }
@@ -1678,6 +1776,18 @@ initMagneticElements();
             sLookY.target = ly;
             sLookXR.target = lx;
             sLookYR.target = ly;
+
+            const pad = 12;
+            const nearEdge = e.clientX <= pad || e.clientX >= window.innerWidth - pad || e.clientY <= pad || e.clientY >= window.innerHeight - pad;
+            if (nearEdge) {
+                if (!isPeekingEdge && mood === 'normal') {
+                    isPeekingEdge = true;
+                    setMood('curious', 0);
+                }
+            } else if (isPeekingEdge) {
+                isPeekingEdge = false;
+                if (mood === 'curious') setMood('normal');
+            }
 
             const curDirX = Math.sign(dx);
             if (curDirX !== 0 && curDirX !== lastDirX && speed > 3 && speed < 42) {
@@ -1695,7 +1805,7 @@ initMagneticElements();
             }
 
             if (speed > 125 && mood !== 'thinking' && mood !== 'speaking' && mood !== 'angry') {
-                setMood('dizzy', 950, '@');
+                setMood('dizzy', 950, '~');
                 sRot.impulse(dx > 0 ? 12 : -12);
             }
 
@@ -1729,7 +1839,7 @@ initMagneticElements();
 
                 if (rapidClicks >= 4) {
                     rapidClicks = 0;
-                    setMood('angry', 2200, '#');
+                    setMood('angry', 2200, '//');
                     sScaleX.impulse(0.36);
                     sScaleY.impulse(0.36);
                     showCursorSpeech(': HEY! Stop poking me!!', 2000, 'angry');
@@ -1756,20 +1866,23 @@ initMagneticElements();
 
         window.addEventListener('keydown', (e) => {
             const active = document.activeElement;
+            const tag = active ? active.tagName.toLowerCase() : '';
+
             if (e.key === 'Backspace') {
                 backspaceCount++;
                 setTimeout(() => { backspaceCount = Math.max(0, backspaceCount - 1); }, 1200);
                 if (backspaceCount >= 5) {
                     backspaceCount = 0;
-                    setMood('angry', 1800, '#');
+                    setMood('angry', 1800, '//');
                     showCursorSpeech(': aggressive deleting!!', 1600, 'angry');
                     return;
                 }
             }
-            if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA')) {
+
+            if (tag === 'input' || tag === 'textarea') {
                 const val = (active.value || '').toLowerCase();
                 if (/\b(angry|mad|hate|stupid|bad|ugly|dumb|annoying)\b/.test(val)) {
-                    setMood('angry', 2000, '#');
+                    setMood('angry', 2000, '//');
                     return;
                 }
                 if (mood !== 'angry') setMood('focus', 850);
@@ -1777,13 +1890,22 @@ initMagneticElements();
                 const sweep = ((active.value?.length || 0) % 18) / 18 * 4.6 - 2.3;
                 sLookX.target = sweep;
                 sLookXR.target = sweep;
+            } else if (!e.metaKey && !e.ctrlKey && !e.altKey) {
+                const key = e.key.toLowerCase();
+                if (key === 'c') {
+                    copySanjuEmail();
+                } else if (key === 'w') {
+                    const isXray = document.body.classList.toggle('blueprint-xray');
+                    setMood(isXray ? 'focus' : 'happy', 1400, '✦');
+                    showCursorSpeech(isXray ? ': blueprint wireframe [W] ON' : '; blueprint wireframe OFF', 1800, isXray ? ':' : ';');
+                }
             }
         });
 
         document.addEventListener('mouseover', (e) => {
             if (mood === 'thinking' || mood === 'speaking' || mood === 'angry') return;
             if (e.target.closest('.project-card, .cs-image, .cs-deck-wrapper')) {
-                setMood('curious', 0, '?');
+                setMood('curious', 0, '✦');
                 sRot.target = -6;
             } else if (e.target.closest('a, button, .nav-tab, .ai-chip, #openComposerBtn')) {
                 setMood('happy');
@@ -1802,28 +1924,51 @@ initMagneticElements();
             }
         });
 
+           let cachedRig = mountRig();
+        let cachedEyeL = document.getElementById('orangeEyeL');
+        let cachedEyeR = document.getElementById('orangeEyeR');
+        let cachedCursor = document.querySelector('.custom-cursor');
+        let cachedAiOut = document.querySelector('.ai-output');
+        let wasDocked = null;
+
+        function refreshCachedNodes() {
+            cachedRig = mountRig();
+            cachedEyeL = document.getElementById('orangeEyeL');
+            cachedEyeR = document.getElementById('orangeEyeR');
+            cachedCursor = document.querySelector('.custom-cursor');
+            cachedAiOut = document.querySelector('.ai-output');
+            if (cachedCursor) {
+                cachedCursor.style.setProperty('--face-x', '0px');
+                cachedCursor.style.setProperty('--face-y', '0px');
+                cachedCursor.style.setProperty('--scale-x', '1');
+                cachedCursor.style.setProperty('--scale-y', '1');
+                cachedCursor.style.setProperty('--rotate', '0deg');
+            }
+        }
+        refreshCachedNodes();
+        window.addEventListener('popstate', () => setTimeout(refreshCachedNodes, 60));
+        document.addEventListener('click', () => setTimeout(refreshCachedNodes, 120));
+
         function tick() {
             t += 0.075;
-            const rig = mountRig();
-            const eyeL = document.getElementById('orangeEyeL');
-            const eyeR = document.getElementById('orangeEyeR');
-            const cursorEl = document.querySelector('.custom-cursor');
-            const isDocked = !hasStartedMoving || !isMouseActive;
-            const isChatting = cursorEl && cursorEl.classList.contains('cursor-chat');
+            if (!cachedRig || !cachedRig.isConnected) refreshCachedNodes();
 
-            if (cursorEl) {
-                cursorEl.style.setProperty('--face-x', '0px');
-                cursorEl.style.setProperty('--face-y', '0px');
+            const isDocked = !hasStartedMoving || !isMouseActive;
+            const isChatting = cachedCursor && cachedCursor.classList.contains('cursor-chat');
+
+            if (cachedCursor && isDocked !== wasDocked) {
+                wasDocked = isDocked;
+                cachedCursor.classList.toggle('is-docked', isDocked);
             }
 
-            const aiOut = document.querySelector('.ai-output');
-            if (aiOut) {
-                const txt = aiOut.textContent.trim();
+            if (cachedAiOut) {
+                const txt = cachedAiOut.textContent;
                 if (txt !== lastObservedText) {
                     lastObservedText = txt;
-                    if (txt.includes('thinking...')) {
+                    const trimmed = txt.trim();
+                    if (trimmed.includes('thinking...')) {
                         setMood('thinking', 0, '...');
-                    } else if (txt.length > 0 && mood !== 'angry') {
+                    } else if (trimmed.length > 0 && mood !== 'angry') {
                         mood = 'speaking';
                         applyPreset('normal');
                         sScaleY.impulse((Math.random() * 0.20) - 0.07);
@@ -1832,57 +1977,50 @@ initMagneticElements();
                         sRH.target = 1.8 + Math.random() * 2.6;
                         clearTimeout(settleTimer);
                         settleTimer = setTimeout(() => {
-                            setMood(txt.startsWith(':') ? 'focus' : 'happy', 2200, '!');
+                            setMood(trimmed.startsWith(':') ? 'focus' : 'happy', 2200, '✦');
                         }, 140);
                     }
                 }
             }
 
-            // Force scale and rotation back to absolute square proportions when docked
             if (isDocked) {
-                sScaleX.target = 1;
-                sScaleY.target = 1;
-                sScaleX.val = 1;
-                sScaleY.val = 1;
-                sScaleX.vel = 0;
-                sScaleY.vel = 0;
-                sRot.target = 0;
-                sRot.val = 0;
-                sRot.vel = 0;
-                sBobY.target = 0;
-                sBobY.val = 0;
-                sBobY.vel = 0;
-            } else {
-                sScaleX.target += (1 - sScaleX.target) * 0.25;
-                sScaleY.target += (1 - sScaleY.target) * 0.25;
-                if (mood === 'normal') {
-                    sRot.target *= 0.85;
+                sScaleX.target = 1; sScaleY.target = 1;
+                sScaleX.val = 1; sScaleY.val = 1;
+                sScaleX.vel = 0; sScaleY.vel = 0;
+                sRot.target = 0; sRot.val = 0; sRot.vel = 0;
+                sBobY.target = 0; sBobY.val = 0; sBobY.vel = 0;
+                sLookX.target = 0; sLookY.target = 0;
+                sLookXR.target = 0; sLookYR.target = 0;
+
+                if (hasStartedMoving && mood !== 'sleep') {
+                    setMood('sleep', 0, 'zZz');
                 }
-            }
+            } else {
+                const stretchX = Math.min(0.18, Math.abs(velX) * 0.008) - Math.min(0.10, Math.abs(velY) * 0.004);
+                const stretchY = Math.min(0.18, Math.abs(velY) * 0.008) - Math.min(0.10, Math.abs(velX) * 0.004);
+                sScaleX.target += ((1 + stretchX) - sScaleX.target) * 0.28;
+                sScaleY.target += ((1 + stretchY) - sScaleY.target) * 0.28;
 
-            sLookX.target *= 0.86;
-            sLookY.target *= 0.86;
-            sLookXR.target *= 0.86;
-            sLookYR.target *= 0.86;
+                if (mood === 'normal') {
+                    sRot.target = Math.max(-12, Math.min(12, velX * 0.35));
+                }
+                sLookX.target *= 0.86;
+                sLookY.target *= 0.86;
+                sLookXR.target *= 0.86;
+                sLookYR.target *= 0.86;
 
-            if (!isDocked) {
                 if (mood === 'thinking') {
                     const scan = Math.sin(t * 2.6) * 2.8;
-                    sLookX.target = scan;
-                    sLookXR.target = scan;
-                    sLookY.target = -1.0;
-                    sLookYR.target = -1.0;
+                    sLookX.target = scan; sLookXR.target = scan;
+                    sLookY.target = -1.0; sLookYR.target = -1.0;
                     sBobY.target = isChatting ? 0 : Math.sin(t * 3.0) * -1.6;
                 } else if (mood === 'angry') {
                     sBobY.target = isChatting ? 0 : Math.sin(t * 14) * 0.9;
                     sRot.target = Math.cos(t * 16) * 4.5;
-                    sScaleX.target = 1.08;
-                    sScaleY.target = 0.94;
+                    sScaleX.target = 1.08; sScaleY.target = 0.94;
                 } else if (mood === 'sleep') {
-                    sBobY.target = isChatting ? 0 : Math.sin(t * 0.5) * 1.0 + 1.0;
-                    sScaleX.target = 1.04 + Math.sin(t * 0.5) * 0.025;
-                    sScaleY.target = 0.94 - Math.sin(t * 0.5) * 0.025;
-                    if (Math.sin(t * 0.5) > 0.97) showEmote('zZz', 700);
+                    sBobY.target = isChatting ? 0 : Math.sin(t * 0.5) * 0.8;
+                    sScaleX.target = 1; sScaleY.target = 1;
                 } else {
                     sBobY.target = isChatting ? 0 : Math.sin(t * 1.1) * -0.55;
                 }
@@ -1908,18 +2046,18 @@ initMagneticElements();
             const rrot = sRRot.step();
             const rOffsetY = sRY.step();
 
-            if (rig) {
-                rig.style.transform = `translate3d(0, ${by.toFixed(2)}px, 0) rotate(${rt.toFixed(2)}deg) scale(${sx.toFixed(3)}, ${sy.toFixed(3)})`;
+            if (cachedRig) {
+                cachedRig.style.transform = `translate3d(0, ${by.toFixed(2)}px, 0) rotate(${rt.toFixed(2)}deg) scale(${sx.toFixed(3)}, ${sy.toFixed(3)})`;
             }
 
-            if (eyeL && eyeR) {
-                eyeL.style.width = `${lw.toFixed(2)}px`;
-                eyeL.style.height = `${lh.toFixed(2)}px`;
-                eyeL.style.transform = `translate3d(${lx.toFixed(2)}px, ${(ly + lOffsetY).toFixed(2)}px, 0) rotate(${lrot.toFixed(1)}deg)`;
+            if (cachedEyeL && cachedEyeR) {
+                cachedEyeL.style.width = `${lw.toFixed(2)}px`;
+                cachedEyeL.style.height = `${lh.toFixed(2)}px`;
+                cachedEyeL.style.transform = `translate3d(${lx.toFixed(2)}px, ${(ly + lOffsetY).toFixed(2)}px, 0) rotate(${lrot.toFixed(1)}deg)`;
 
-                eyeR.style.width = `${rw.toFixed(2)}px`;
-                eyeR.style.height = `${rh.toFixed(2)}px`;
-                eyeR.style.transform = `translate3d(${rx.toFixed(2)}px, ${(ry + rOffsetY).toFixed(2)}px, 0) rotate(${rrot.toFixed(1)}deg)`;
+                cachedEyeR.style.width = `${rw.toFixed(2)}px`;
+                cachedEyeR.style.height = `${rh.toFixed(2)}px`;
+                cachedEyeR.style.transform = `translate3d(${rx.toFixed(2)}px, ${(ry + rOffsetY).toFixed(2)}px, 0) rotate(${rrot.toFixed(1)}deg)`;
             }
 
             requestAnimationFrame(tick);
@@ -1928,76 +2066,160 @@ initMagneticElements();
         requestAnimationFrame(tick);
     }
 
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', bootOrangeSpringEngine);
-    } else {
-        bootOrangeSpringEngine();
-    }
-})();
+    const visits = parseInt(localStorage.getItem('orange_visit_count') || '0', 10) + 1;
+    localStorage.setItem('orange_visit_count', String(visits));
 
-
-
-(function() {
-    const headerCss = `
-        .frame-3 {
-            display: flex !important;
-            align-items: center !important;
-            justify-content: space-between !important;
-            gap: 8px !important;
-        }
-        .top-ist-status {
-            display: inline-flex !important;
-            align-items: center !important;
-            gap: 6px !important;
-            white-space: nowrap !important;
-            font-variant-numeric: tabular-nums !important;
-            cursor: pointer !important;
-            transition: color 0.2s ease !important;
-            line-height: 1 !important;
-        }
-        .top-ist-dot {
-            width: 6px !important;
-            height: 6px !important;
-            background-color: #DC5C2C !important;
-            border-radius: 0px !important;
-            display: inline-block !important;
-            flex-shrink: 0 !important;
-            animation: statusPulse 2.2s infinite ease-in-out !important;
-        }
-        @keyframes statusPulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.4; transform: scale(0.85); }
-        }
-        @media (max-width: 640px) {
-            .top-ist-status {
-                font-size: 12px !important;
-                letter-spacing: -0.01em !important;
-            }
-            .top-ist-status .desk-only {
-                display: none !important;
-            }
-        }
-    `;
-
-    function injectHeaderStyles() {
-        if (!document.getElementById('ist-header-styles')) {
-            const st = document.createElement('style');
-            st.id = 'ist-header-styles';
-            st.textContent = headerCss;
-            document.head.appendChild(st);
+    function getSavedVisitorName() {
+        try {
+            const notes = JSON.parse(localStorage.getItem('sanju_visitor_notes') || '[]');
+            const named = notes.find(n => n && n.author && n.author.toLowerCase() !== 'anonymous');
+            return named ? named.author.split(' ')[0] : null;
+        } catch (e) {
+            return null;
         }
     }
 
-    
+    function getVisitorCity() {
+        try {
+            const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+            if (!tz.includes('/')) return null;
+            const city = tz.split('/').pop().replace(/_/g, ' ');
+            if (city === 'Calcutta' || city === 'Kolkata') return 'India';
+            return city;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    function getReferrerSource() {
+        const ref = (document.referrer || '').toLowerCase();
+        const params = new URLSearchParams(window.location.search);
+        const utm = (params.get('ref') || params.get('utm_source') || '').toLowerCase();
+        const source = `${ref} ${utm}`;
+        if (source.includes('linkedin')) return 'LinkedIn';
+        if (source.includes('t.co') || source.includes('twitter') || source.includes('x.com')) return 'X';
+        if (source.includes('github')) return 'GitHub';
+        if (source.includes('instagram')) return 'Instagram';
+        return null;
+    }
+
+    function getTimeFlavor() {
+        const hr = new Date().getHours();
+        const day = new Date().getDay();
+        if (hr >= 23 || hr < 4) return "; burning the midnight oil? i'm Orange!";
+        if (hr >= 5 && hr < 11) return "; good morning! grab a coffee & explore";
+        if (day === 0 || day === 6) return "; weekend portfolio hunting? welcome!";
+        return null;
+    }
+
+    function getHardwareFlavor() {
+        const ua = navigator.userAgent.toLowerCase();
+        if (window.screen.width >= 2560) return ": press [W] to toggle blueprint grid view";
+        if (ua.includes('mac')) return "; fellow Mac user! press [C] to copy email";
+        if (ua.includes('linux')) return ": Linux user spotted! press [W] for wireframe view";
+        return "; press [W] for blueprint view or [C] for email";
+    }
+
+    let batteryAlert = null;
+    if (navigator.getBattery) {
+        navigator.getBattery().then(bat => {
+            if (!bat.charging && bat.level <= 0.20) {
+                batteryAlert = `: heads up—your battery is at ${Math.round(bat.level * 100)}%!`;
+            }
+        }).catch(() => {});
+    }
+
+    function buildPersonalGreeting() {
+        const savedName = getSavedVisitorName();
+        const refSource = getReferrerSource();
+        const city = getVisitorCity();
+        const timeMsg = getTimeFlavor();
+
+        if (savedName && visits > 1) return `; welcome back, ${savedName}! missed you ♥`;
+        if (refSource) return `; hey ${refSource} traveler! i'm Orange`;
+        if (batteryAlert) return batteryAlert;
+        if (visits > 2) return `; back for visit #${visits}! glad you're here ♥`;
+        if (city && city !== 'India') return `; visiting from ${city}? hi, i'm Orange!`;
+        if (timeMsg) return timeMsg;
+        if (city === 'India') return "; same timezone as Sanju! hi, i'm Orange";
+        return "; hi! i'm Orange, Sanju's AI companion";
+    }
+
+    function updatePageClickReactions() {
+        if (typeof clickReactions === 'undefined' || !Array.isArray(clickReactions)) return;
+        const path = window.location.pathname.toLowerCase();
+        const hwLine = getHardwareFlavor();
+        let pool = [];
+
+        if (path.includes('velo') || path.includes('workmate') || path.includes('esummit')) {
+            pool = [
+                ": click any screen to inspect full-res!",
+                "; press [W] to inspect the layout wireframe",
+                ": press / to ask me about this case study",
+                "; press [C] to copy Sanju's email",
+                hwLine
+            ];
+        } else if (path.includes('notes')) {
+            pool = [
+                "; draw a doodle on the wall!",
+                "; leave your name & i'll remember you next time",
+                ": 100% live Firebase cloud wall",
+                hwLine
+            ];
+        } else if (path.includes('sidequest')) {
+            pool = [
+                "; WebGL shaders & 3D experiments live here!",
+                ": built with Three.js & custom GLSL",
+                hwLine
+            ];
+        } else if (path.includes('about')) {
+            pool = [
+                "; press [C] to copy Sanju's email!",
+                ": CSE '28 undergrad & product designer",
+                "; powered by coffee & One Piece",
+                hwLine
+            ];
+        } else {
+            pool = [
+                "; press / to ask me anything!",
+                "; press [C] to copy Sanju's email",
+                ": press [W] to toggle blueprint X-ray mode",
+                "; wiggle your mouse to pet me!",
+                hwLine
+            ];
+        }
+
+        if (batteryAlert) pool.unshift(batteryAlert);
+        clickReactions.length = 0;
+        clickReactions.push(...pool);
+    }
+
+    const origShowSpeech = window.showCursorSpeech;
+    if (typeof origShowSpeech === 'function') {
+        window.showCursorSpeech = function(msg, duration = 0, mood = 'happy') {
+            if (typeof msg === 'string' && msg.includes('zzz... press / to wake me up')) {
+                return;
+            }
+            if (typeof msg === 'string' && msg.includes("hi! i'm Sanju's AI companion")) {
+                const personalMsg = buildPersonalGreeting();
+                const isLove = personalMsg.includes('♥');
+                if (isLove && typeof window.setOrangeExpression === 'function') {
+                    window.setOrangeExpression('love', 2000, '♥');
+                }
+                return origShowSpeech(personalMsg, 2800, isLove ? ';' : mood);
+            }
+            return origShowSpeech(msg, duration, mood);
+        };
+    }
 
     function copySanjuEmail() {
         const email = 'isanjukatariya@gmail.com';
         navigator.clipboard.writeText(email).then(() => {
             if (typeof window.setOrangeExpression === 'function') {
-                window.setOrangeExpression('love', 1600, '✓');
+                window.setOrangeExpression('love', 1600, '✦');
             }
-            if (typeof showCursorSpeech === 'function') {
-                showCursorSpeech('; copied isanjukatariya@gmail.com!', 2200, ';');
+            if (typeof window.showCursorSpeech === 'function') {
+                window.showCursorSpeech('; copied isanjukatariya@gmail.com!', 2200, ';');
             }
             const headerStatus = document.querySelector('.top-ist-status');
             if (headerStatus) {
@@ -2015,12 +2237,10 @@ initMagneticElements();
     }
 
     function updateHeaderClock() {
-        injectHeaderStyles();
         const topBar = document.querySelector('.frame-3');
         if (!topBar) return;
 
         let rightEl = topBar.querySelector('.top-ist-status') || topBar.querySelector('.frame-2') || topBar.querySelector('.roles');
-
         if (!rightEl) {
             rightEl = document.createElement('div');
             rightEl.className = 'frame-2 top-ist-status roles';
@@ -2045,19 +2265,602 @@ initMagneticElements();
             hour12: true
         });
 
-        rightEl.innerHTML = `<span class="top-ist-dot"></span><span>IST ${now}</span><span class="desk-only">• Available for Internships</span>`;
+        rightEl.innerHTML = `<span class="top-ist-dot"></span><span>IST ${now}</span><span class="desk-only">• Available [C]</span>`;
     }
 
-    document.addEventListener('keydown', (e) => {
-        const tag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
-        if (tag === 'input' || tag === 'textarea' || e.metaKey || e.ctrlKey || e.altKey) return;
-        if (e.key.toLowerCase() === 'c') {
-            copySanjuEmail();
+    document.addEventListener('click', (e) => {
+        if (e.target.closest('.resume-link')) {
+            sessionStorage.setItem('orange_viewing_resume', 'true');
+        }
+        setTimeout(() => {
+            updatePageClickReactions();
+            updateHeaderClock();
+        }, 140);
+    });
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible' && sessionStorage.getItem('orange_viewing_resume') === 'true') {
+            sessionStorage.removeItem('orange_viewing_resume');
+            setTimeout(() => {
+                if (typeof window.setOrangeExpression === 'function') {
+                    window.setOrangeExpression('wink', 1600, '✦');
+                }
+                if (typeof window.showCursorSpeech === 'function') {
+                    window.showCursorSpeech('; liked the resume? press [C] to copy email!', 2600, ';');
+                }
+            }, 300);
         }
     });
 
-    updateHeaderClock();
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+            bootUnifiedOrangeSystem();
+            updateHeaderClock();
+            updatePageClickReactions();
+        });
+    } else {
+        bootUnifiedOrangeSystem();
+        updateHeaderClock();
+        updatePageClickReactions();
+    }
+
     setInterval(updateHeaderClock, 10000);
-    window.addEventListener('popstate', () => setTimeout(updateHeaderClock, 80));
-    document.addEventListener('click', () => setTimeout(updateHeaderClock, 120));
+    window.addEventListener('popstate', () => {
+        setTimeout(() => {
+            updateHeaderClock();
+            updatePageClickReactions();
+        }, 100);
+    });
+})();
+
+
+
+
+
+
+
+(function() {
+    const marvelCss = `
+        .cad-crosshair-x, .cad-crosshair-y, .cad-coords {
+            position: fixed !important;
+            pointer-events: none !important;
+            z-index: 99998 !important;
+            display: none !important;
+        }
+        body.blueprint-xray .cad-crosshair-x,
+        body.blueprint-xray .cad-crosshair-y,
+        body.blueprint-xray .cad-coords {
+            display: block !important;
+        }
+        .cad-crosshair-x {
+            left: 0 !important;
+            right: 0 !important;
+            height: 1px !important;
+            background: rgba(220, 92, 44, 0.35) !important;
+        }
+        .cad-crosshair-y {
+            top: 0 !important;
+            bottom: 0 !important;
+            width: 1px !important;
+            background: rgba(220, 92, 44, 0.35) !important;
+        }
+        .cad-coords {
+            font-family: 'Bricolage Grotesque', monospace, sans-serif !important;
+            font-size: 10px !important;
+            font-weight: 700 !important;
+            background: #DC5C2C !important;
+            color: #FAF8F5 !important;
+            padding: 2px 5px !important;
+            letter-spacing: 0.04em !important;
+            white-space: nowrap !important;
+            transform: translate(12px, -24px) !important;
+        }
+        .cad-spec-badge {
+            position: absolute !important;
+            top: 0 !important;
+            right: 0 !important;
+            background: #DC5C2C !important;
+            color: #FFFFFF !important;
+            font-family: 'Bricolage Grotesque', monospace, sans-serif !important;
+            font-size: 10px !important;
+            font-weight: 700 !important;
+            padding: 2px 6px !important;
+            z-index: 30 !important;
+            pointer-events: none !important;
+            letter-spacing: 0.03em !important;
+        }
+        .agent-highlight-pulse {
+            outline: 2px solid #DC5C2C !important;
+            outline-offset: 6px !important;
+            transition: outline 0.25s ease, outline-offset 0.25s ease !important;
+        }
+        .ghost-peer-cursor {
+            position: fixed !important;
+            width: 14px !important;
+            height: 14px !important;
+            border: 1.5px dashed #DC5C2C !important;
+            background: rgba(220, 92, 44, 0.14) !important;
+            pointer-events: none !important;
+            z-index: 99990 !important;
+            transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.4s ease !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+        .ghost-peer-label {
+            position: absolute !important;
+            top: -16px !important;
+            left: 16px !important;
+            font-family: 'Bricolage Grotesque', monospace, sans-serif !important;
+            font-size: 9px !important;
+            font-weight: 700 !important;
+            color: #DC5C2C !important;
+            background: #FAF8F5 !important;
+            border: 1px solid rgba(220, 92, 44, 0.4) !important;
+            padding: 1px 4px !important;
+            white-space: nowrap !important;
+        }
+        .next-case-architectural {
+            margin: 72px 0 24px 0 !important;
+            padding: 28px 32px !important;
+            border: 1px solid rgba(24, 34, 45, 0.16) !important;
+            background: rgba(220, 92, 44, 0.025) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            gap: 20px !important;
+            text-decoration: none !important;
+            color: #18222D !important;
+            transition: border-color 0.22s ease, background-color 0.22s ease, transform 0.22s ease !important;
+            cursor: pointer !important;
+        }
+        .next-case-architectural:hover {
+            border-color: #DC5C2C !important;
+            background: rgba(220, 92, 44, 0.07) !important;
+            transform: translateY(-2px) !important;
+        }
+        .next-case-meta {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 6px !important;
+        }
+        .next-case-kicker {
+            font-size: 11px !important;
+            font-weight: 700 !important;
+            letter-spacing: 0.08em !important;
+            text-transform: uppercase !important;
+            color: #DC5C2C !important;
+        }
+        .next-case-title {
+            font-size: 22px !important;
+            font-weight: 700 !important;
+            color: #18222D !important;
+            line-height: 1.2 !important;
+        }
+        .next-case-sub {
+            font-size: 13px !important;
+            color: rgba(24, 34, 45, 0.68) !important;
+        }
+        .next-case-arrow {
+            font-size: 20px !important;
+            font-weight: 700 !important;
+            color: #DC5C2C !important;
+            white-space: nowrap !important;
+        }
+        .sq-tech-pill {
+            display: inline-block !important;
+            margin-top: 6px !important;
+            padding: 2px 7px !important;
+            font-size: 11px !important;
+            font-weight: 600 !important;
+            color: #DC5C2C !important;
+            border: 1px solid rgba(220, 92, 44, 0.35) !important;
+            background: rgba(220, 92, 44, 0.05) !important;
+            letter-spacing: 0.02em !important;
+        }
+        .live-peer-pill {
+            color: #DC5C2C !important;
+            font-weight: 700 !important;
+            margin-left: 4px !important;
+        }
+        @media (max-width: 768px) {
+            .cad-crosshair-x, .cad-crosshair-y, .cad-coords, .ghost-peer-cursor {
+                display: none !important;
+            }
+            .next-case-architectural {
+                padding: 20px !important;
+                flex-direction: column !important;
+                align-items: flex-start !important;
+            }
+        }
+    `;
+
+    function injectMarvelStyles() {
+        if (!document.getElementById('orange-marvel-styles')) {
+            const st = document.createElement('style');
+            st.id = 'orange-marvel-styles';
+            st.textContent = marvelCss;
+            document.head.appendChild(st);
+        }
+    }
+
+    let crossX = null, crossY = null, coordsEl = null;
+
+    function ensureCadHud() {
+        injectMarvelStyles();
+        if (!crossX) {
+            crossX = document.createElement('div');
+            crossX.className = 'cad-crosshair-x';
+            crossY = document.createElement('div');
+            crossY.className = 'cad-crosshair-y';
+            coordsEl = document.createElement('div');
+            coordsEl.className = 'cad-coords';
+            document.body.append(crossX, crossY, coordsEl);
+        }
+    }
+
+    function refreshCadSpecBadges() {
+        document.querySelectorAll('.cad-spec-badge').forEach(b => b.remove());
+        if (!document.body.classList.contains('blueprint-xray')) return;
+
+        const targets = document.querySelectorAll('.project-card, .cs-image, .note-card, .cs-stats-row, .lost-card');
+        targets.forEach((el) => {
+            const rect = el.getBoundingClientRect();
+            if (rect.width < 40 || rect.height < 25) return;
+            const computed = window.getComputedStyle(el);
+            if (computed.position === 'static') el.style.position = 'relative';
+
+            const badge = document.createElement('span');
+            badge.className = 'cad-spec-badge';
+            badge.textContent = `${Math.round(rect.width)} × ${Math.round(rect.height)}px`;
+            el.appendChild(badge);
+        });
+    }
+
+    window.addEventListener('mousemove', (e) => {
+        if (!document.body.classList.contains('blueprint-xray')) return;
+        ensureCadHud();
+        crossX.style.top = `${e.clientY}px`;
+        crossY.style.left = `${e.clientX}px`;
+        coordsEl.style.left = `${e.clientX}px`;
+        coordsEl.style.top = `${e.clientY}px`;
+        coordsEl.textContent = `X:${e.clientX} Y:${e.clientY} // GRID:0PX`;
+    });
+
+    const bodyAttrObserver = new MutationObserver(() => {
+        ensureCadHud();
+        refreshCadSpecBadges();
+    });
+    bodyAttrObserver.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+    window.addEventListener('resize', () => {
+        if (document.body.classList.contains('blueprint-xray')) refreshCadSpecBadges();
+    });
+
+    let activeTourTimers = [];
+    function clearTour() {
+        activeTourTimers.forEach(t => clearTimeout(t));
+        activeTourTimers = [];
+        document.querySelectorAll('.agent-highlight-pulse').forEach(el => el.classList.remove('agent-highlight-pulse'));
+    }
+
+    function pulseAndScrollTo(el, speechText, mood = ';') {
+        if (!el) return;
+        document.querySelectorAll('.agent-highlight-pulse').forEach(n => n.classList.remove('agent-highlight-pulse'));
+        el.classList.add('agent-highlight-pulse');
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        if (typeof window.setOrangeExpression === 'function') {
+            window.setOrangeExpression(mood === ';' ? 'happy' : 'focus', 2200, '✦');
+        }
+        if (speechText && typeof window.showCursorSpeech === 'function') {
+            window.showCursorSpeech(speechText, 2400, mood);
+        }
+        setTimeout(() => el.classList.remove('agent-highlight-pulse'), 2400);
+    }
+
+    function runAgenticTour() {
+        clearTour();
+        const wrapper = document.querySelector('.orange-ai-wrapper.open');
+        if (wrapper) {
+            const closeBtn = wrapper.querySelector('.ai-close-btn');
+            if (closeBtn) closeBtn.click();
+        }
+
+        const path = window.location.pathname.toLowerCase();
+        const isCaseStudy = path.includes('velo') || path.includes('workmate') || path.includes('esummit');
+
+        if (isCaseStudy) {
+            const steps = [
+                { sel: '.cs-stats-row, .case-study h1', msg: ': step 1 // core impact & headline metrics', mood: ':' },
+                { sel: '.cs-feature-grid, .cs-split-grid, .cs-image', msg: '; step 2 // system architecture & flows', mood: ';' },
+                { sel: '.cs-deck-wrapper, .next-case-architectural', msg: ': step 3 // full pitch deck & next project!', mood: ':' }
+            ];
+            let delay = 100;
+            steps.forEach((st) => {
+                const target = document.querySelector(st.sel);
+                if (target) {
+                    activeTourTimers.push(setTimeout(() => pulseAndScrollTo(target, st.msg, st.mood), delay));
+                    delay += 2800;
+                }
+            });
+        } else {
+            const cards = document.querySelectorAll('.project-card');
+            const c1 = cards[0];
+            const c2 = cards[1];
+            const c3 = cards[2];
+            const steps = [
+                { el: c1, msg: '; 01 // Velo: <15s QR EV unlock & 3D branding', mood: ';' },
+                { el: c2, msg: ': 02 // WorkMate: cut supervisor calls by 80%', mood: ':' },
+                { el: c3, msg: '; 03 // E-Summit 26: 10+ tracks & <30s reg', mood: ';' },
+                { el: document.querySelector('.top-ist-status') || document.querySelector('.frame-3'), msg: '; press [C] anytime to copy Sanju’s email!', mood: ';' }
+            ];
+            let delay = 100;
+            steps.forEach((st) => {
+                if (st.el) {
+                    activeTourTimers.push(setTimeout(() => pulseAndScrollTo(st.el, st.msg, st.mood), delay));
+                    delay += 2700;
+                }
+            });
+        }
+    }
+
+    function executeSmartChipAction(cmd) {
+        if (cmd === '__TOUR__') {
+            runAgenticTour();
+            return true;
+        }
+        if (cmd === '__BLUEPRINT__') {
+            const isXray = document.body.classList.toggle('blueprint-xray');
+            refreshCadSpecBadges();
+            if (typeof window.setOrangeExpression === 'function') {
+                window.setOrangeExpression(isXray ? 'focus' : 'happy', 1500, '✦');
+            }
+            if (typeof window.showCursorSpeech === 'function') {
+                window.showCursorSpeech(isXray ? ': CAD Blueprint HUD [W] ON' : '; CAD Blueprint HUD OFF', 1900, isXray ? ':' : ';');
+            }
+            return true;
+        }
+        if (cmd === '__METRICS__') {
+            const stats = document.querySelector('.cs-stats-row') || document.querySelector('.project-card');
+            if (stats) {
+                pulseAndScrollTo(stats, ': key measurable outcomes right here!', ':');
+                return true;
+            }
+        }
+        if (cmd === '__COPY_EMAIL__') {
+            document.dispatchEvent(new KeyboardEvent('keydown', { key: 'c' }));
+            return true;
+        }
+        return false;
+    }
+
+    function upgradeAiChipsAndContext() {
+        const chipContainer = document.querySelector('.orange-ai-wrapper .ai-chips');
+        const outputEl = document.querySelector('.orange-ai-wrapper .ai-output');
+        if (!chipContainer) return;
+
+        const path = window.location.pathname.toLowerCase();
+        if (chipContainer.dataset.upgradedPath === path) return;
+        chipContainer.dataset.upgradedPath = path;
+
+        let chipsConfig = [];
+        if (path.includes('velo') || path.includes('workmate') || path.includes('esummit')) {
+            chipsConfig = [
+                { label: '⚡ Highlight Impact Metrics', action: '__METRICS__' },
+                { label: '🧭 10s Case Study Tour', action: '__TOUR__' },
+                { label: '📐 Toggle CAD Blueprint [W]', action: '__BLUEPRINT__' },
+                { label: '📋 Copy Sanju Email [C]', action: '__COPY_EMAIL__' }
+            ];
+        } else {
+            chipsConfig = [
+                { label: '🧭 20s Guided Portfolio Tour', action: '__TOUR__' },
+                { label: '📐 Toggle CAD Blueprint [W]', action: '__BLUEPRINT__' },
+                { label: '🧠 Why Hire Sanju?', q: 'Why should we hire Sanju? What makes his design & frontend work stand out?' },
+                { label: '📋 Copy Email [C]', action: '__COPY_EMAIL__' }
+            ];
+        }
+
+        chipContainer.innerHTML = chipsConfig.map(c =>
+            `<button type="button" class="ai-chip" data-action="${c.action || ''}" data-q="${c.q || ''}">${c.label}</button>`
+        ).join('');
+
+        chipContainer.querySelectorAll('.ai-chip').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const act = btn.getAttribute('data-action');
+                const q = btn.getAttribute('data-q');
+                if (act && executeSmartChipAction(act)) return;
+                if (q) {
+                    const inputEl = document.querySelector('.orange-ai-wrapper .ai-input');
+                    if (inputEl) {
+                        inputEl.value = q;
+                        inputEl.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+                    } else if (outputEl && typeof typeAIMessage === 'function') {
+                        typeAIMessage(": Sanju bridges product thinking with real frontend engineering—shipping <15s EV flows (Velo), 80% fewer support calls (WorkMate), and custom 60fps WebGL/JS systems.", outputEl);
+                    }
+                }
+            });
+        });
+    }
+
+    function injectNextCaseStudyBlock() {
+        const path = window.location.pathname.toLowerCase();
+        const caseContainer = document.querySelector('.case-study');
+        if (!caseContainer || document.querySelector('.next-case-architectural')) return;
+
+        let nextData = null;
+        if (path.includes('velo')) {
+            nextData = {
+                href: 'workmate.html',
+                kicker: 'NEXT CASE STUDY // 02 OF 03',
+                title: 'WorkMate: Multilingual Workforce Experience',
+                sub: 'How 1-tap regional language switching & visual checklists cut supervisor calls by 80%.'
+            };
+        } else if (path.includes('workmate')) {
+            nextData = {
+                href: 'esummit.html',
+                kicker: 'NEXT CASE STUDY // 03 OF 03',
+                title: "E-Summit '26: Ideas Beyond Boundaries",
+                sub: 'Designing a high-conversion flagship entrepreneurship platform with 10+ tracks & <30s registration.'
+            };
+        } else if (path.includes('esummit')) {
+            nextData = {
+                href: 'velo.html',
+                kicker: 'NEXT CASE STUDY // 01 OF 03',
+                title: 'Velo: Smart Campus EV Mobility App',
+                sub: 'Sub-15s QR unlock flow, live dock radar, pause-ride mode, and custom Blender 3D branding.'
+            };
+        }
+
+        if (!nextData) return;
+
+        const block = document.createElement('a');
+        block.href = nextData.href;
+        block.className = 'next-case-architectural';
+        block.setAttribute('data-message', `; click to read ${nextData.title.split(':')[0]}`);
+        block.innerHTML = `
+            <div class="next-case-meta">
+                <span class="next-case-kicker">${nextData.kicker}</span>
+                <span class="next-case-title">${nextData.title}</span>
+                <span class="next-case-sub">${nextData.sub}</span>
+            </div>
+            <span class="next-case-arrow">Explore Next →</span>
+        `;
+        caseContainer.appendChild(block);
+    }
+
+    function decorateSideQuestSpecs() {
+        const path = window.location.pathname.toLowerCase();
+        if (!path.includes('sidequest')) return;
+
+        
+        cards.forEach((card, idx) => {
+            if (card.querySelector('.sq-tech-pill')) return;
+            const desc = card.querySelector('p') || card;
+            const pill = document.createElement('div');
+            pill.className = 'sq-tech-pill';
+            pill.textContent = specs[idx % specs.length];
+            desc.appendChild(pill);
+        });
+    }
+
+    const sessionId = 'peer_' + Math.random().toString(36).slice(2, 9);
+    const visitorCity = (() => {
+        try {
+            const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+            return tz.includes('/') ? tz.split('/').pop().replace(/_/g, ' ') : 'Visitor';
+        } catch (e) { return 'Visitor'; }
+    })();
+
+    let normX = 0.5, normY = 0.3;
+    window.addEventListener('mousemove', (e) => {
+        normX = Number((e.clientX / Math.max(1, window.innerWidth)).toFixed(3));
+        normY = Number((e.clientY / Math.max(1, window.innerHeight)).toFixed(3));
+    });
+
+    const ghostNodes = new Map();
+
+    async function syncMultiplayerPresence() {
+        if (typeof FIREBASE_DB_URL === 'undefined' || !FIREBASE_DB_URL) return;
+        const base = FIREBASE_DB_URL.replace(/\/$/, '');
+        const now = Date.now();
+
+        try {
+            await fetch(`${base}/presence/${sessionId}.json`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    x: normX,
+                    y: normY,
+                    city: visitorCity,
+                    page: window.location.pathname.replace(/\//g, '') || 'index.html',
+                    ts: now
+                })
+            });
+
+            const res = await fetch(`${base}/presence.json`);
+            if (!res.ok) return;
+            const all = await res.json();
+            if (!all || typeof all !== 'object') return;
+
+            let activeCount = 0;
+            const activeIds = new Set();
+
+            Object.entries(all).forEach(([id, data]) => {
+                if (!data || typeof data !== 'object') return;
+                const age = now - (data.ts || 0);
+                if (age < 25000) {
+                    activeCount++;
+                    if (id !== sessionId && window.innerWidth > 768) {
+                        activeIds.add(id);
+                        let ghost = ghostNodes.get(id);
+                        if (!ghost) {
+                            ghost = document.createElement('div');
+                            ghost.className = 'ghost-peer-cursor';
+                            ghost.innerHTML = `<span class="ghost-peer-label"></span>`;
+                            document.body.appendChild(ghost);
+                            ghostNodes.set(id, ghost);
+                        }
+                        const gx = Math.round((data.x || 0.5) * window.innerWidth);
+                        const gy = Math.round((data.y || 0.3) * window.innerHeight);
+                        ghost.style.transform = `translate3d(${gx}px, ${gy}px, 0)`;
+                        const label = ghost.querySelector('.ghost-peer-label');
+                        if (label) label.textContent = `: ${data.city || 'peer'}`;
+                    }
+                } else if (age > 60000) {
+                    fetch(`${base}/presence/${id}.json`, { method: 'DELETE' }).catch(() => {});
+                }
+            });
+
+            ghostNodes.forEach((node, id) => {
+                if (!activeIds.has(id)) {
+                    node.remove();
+                    ghostNodes.delete(id);
+                }
+            });
+
+            const headerStatus = document.querySelector('.top-ist-status');
+            if (headerStatus && headerStatus.dataset.copied !== 'true') {
+                let peerBadge = headerStatus.querySelector('.live-peer-pill');
+                if (activeCount > 1) {
+                    if (!peerBadge) {
+                        peerBadge = document.createElement('span');
+                        peerBadge.className = 'live-peer-pill';
+                        headerStatus.appendChild(peerBadge);
+                    }
+                    peerBadge.textContent = `• ${activeCount} LIVE`;
+                } else if (peerBadge) {
+                    peerBadge.remove();
+                }
+            }
+        } catch (e) {}
+    }
+
+    window.addEventListener('beforeunload', () => {
+        if (typeof FIREBASE_DB_URL !== 'undefined' && FIREBASE_DB_URL) {
+            const base = FIREBASE_DB_URL.replace(/\/$/, '');
+            navigator.sendBeacon && navigator.sendBeacon(`${base}/presence/${sessionId}.json`, 'null');
+        }
+    });
+
+    function bootAllMarvelUpgrades() {
+        ensureCadHud();
+        upgradeAiChipsAndContext();
+        injectNextCaseStudyBlock();
+        decorateSideQuestSpecs();
+        if (document.body.classList.contains('blueprint-xray')) {
+            refreshCadSpecBadges();
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', bootAllMarvelUpgrades);
+    } else {
+        bootAllMarvelUpgrades();
+    }
+
+    setTimeout(syncMultiplayerPresence, 1200);
+    setInterval(syncMultiplayerPresence, 6500);
+
+    window.addEventListener('popstate', () => setTimeout(bootAllMarvelUpgrades, 120));
+    document.addEventListener('click', () => setTimeout(bootAllMarvelUpgrades, 180));
 })();
