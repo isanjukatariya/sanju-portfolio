@@ -1987,3 +1987,189 @@ html.lenis, html.lenis body {
   from { transform: scale(0.75); opacity: 0.65; }
   to { transform: scale(1.15); opacity: 1; }
 }
+
+::selection {
+            background-color: rgba(220, 92, 44, 0.16) !important;
+            color: #18222D !important;
+        }
+        .custom-cursor:not(.cursor-chat) .cursor-text-content {
+            opacity: 0 !important;
+            pointer-events: none !important;
+            visibility: hidden !important;
+        }
+
+        
+
+
+
+
+
+        /* ========================================================================== */
+/* ORANGE.AI // MARVEL UPGRADE STYLES                                         */
+/* ========================================================================== */
+
+/* CAD Blueprint X-Ray Mode */
+.cad-crosshair-x, .cad-crosshair-y, .cad-coords {
+    position: fixed !important;
+    pointer-events: none !important;
+    z-index: 99998 !important;
+    display: none !important;
+}
+body.blueprint-xray .cad-crosshair-x,
+body.blueprint-xray .cad-crosshair-y,
+body.blueprint-xray .cad-coords {
+    display: block !important;
+}
+.cad-crosshair-x {
+    left: 0 !important;
+    right: 0 !important;
+    height: 1px !important;
+    background: rgba(220, 92, 44, 0.35) !important;
+}
+.cad-crosshair-y {
+    top: 0 !important;
+    bottom: 0 !important;
+    width: 1px !important;
+    background: rgba(220, 92, 44, 0.35) !important;
+}
+.cad-coords {
+    font-family: 'Bricolage Grotesque', monospace, sans-serif !important;
+    font-size: 10px !important;
+    font-weight: 700 !important;
+    background: #DC5C2C !important;
+    color: #FAF8F5 !important;
+    padding: 2px 5px !important;
+    letter-spacing: 0.04em !important;
+    white-space: nowrap !important;
+    transform: translate(12px, -24px) !important;
+}
+.cad-spec-badge {
+    position: absolute !important;
+    top: 0 !important;
+    right: 0 !important;
+    background: #DC5C2C !important;
+    color: #FFFFFF !important;
+    font-family: 'Bricolage Grotesque', monospace, sans-serif !important;
+    font-size: 10px !important;
+    font-weight: 700 !important;
+    padding: 2px 6px !important;
+    z-index: 30 !important;
+    pointer-events: none !important;
+    letter-spacing: 0.03em !important;
+}
+
+/* Agentic DOM Highlight Pulse */
+.agent-highlight-pulse {
+    outline: 2px solid #DC5C2C !important;
+    outline-offset: 6px !important;
+    transition: outline 0.25s ease, outline-offset 0.25s ease !important;
+}
+
+/* Multiplayer Ghost Cursors */
+.ghost-peer-cursor {
+    position: fixed !important;
+    width: 14px !important;
+    height: 14px !important;
+    border: 1.5px dashed #DC5C2C !important;
+    background: rgba(220, 92, 44, 0.14) !important;
+    pointer-events: none !important;
+    z-index: 99990 !important;
+    transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.4s ease !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+.ghost-peer-label {
+    position: absolute !important;
+    top: -16px !important;
+    left: 16px !important;
+    font-family: 'Bricolage Grotesque', monospace, sans-serif !important;
+    font-size: 9px !important;
+    font-weight: 700 !important;
+    color: #DC5C2C !important;
+    background: #FAF8F5 !important;
+    border: 1px solid rgba(220, 92, 44, 0.4) !important;
+    padding: 1px 4px !important;
+    white-space: nowrap !important;
+}
+
+/* Next Case Study Architectural Card */
+.next-case-architectural {
+    margin: 72px 0 24px 0 !important;
+    padding: 28px 32px !important;
+    border: 1px solid rgba(24, 34, 45, 0.16) !important;
+    background: rgba(220, 92, 44, 0.025) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 20px !important;
+    text-decoration: none !important;
+    color: #18222D !important;
+    transition: border-color 0.22s ease, background-color 0.22s ease, transform 0.22s ease !important;
+    cursor: pointer !important;
+}
+.next-case-architectural:hover {
+    border-color: #DC5C2C !important;
+    background: rgba(220, 92, 44, 0.07) !important;
+    transform: translateY(-2px) !important;
+}
+.next-case-meta {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 6px !important;
+}
+.next-case-kicker {
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.08em !important;
+    text-transform: uppercase !important;
+    color: #DC5C2C !important;
+}
+.next-case-title {
+    font-size: 22px !important;
+    font-weight: 700 !important;
+    color: #18222D !important;
+    line-height: 1.2 !important;
+}
+.next-case-sub {
+    font-size: 13px !important;
+    color: rgba(24, 34, 45, 0.68) !important;
+}
+.next-case-arrow {
+    font-size: 20px !important;
+    font-weight: 700 !important;
+    color: #DC5C2C !important;
+    white-space: nowrap !important;
+}
+
+/* Side Quest Tech Pill */
+.sq-tech-pill {
+    display: inline-block !important;
+    margin-top: 6px !important;
+    padding: 2px 7px !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    color: #DC5C2C !important;
+    border: 1px solid rgba(220, 92, 44, 0.35) !important;
+    background: rgba(220, 92, 44, 0.05) !important;
+    letter-spacing: 0.02em !important;
+}
+
+/* Live Peer Count Pill */
+.live-peer-pill {
+    color: #DC5C2C !important;
+    font-weight: 700 !important;
+    margin-left: 4px !important;
+}
+
+/* Mobile Responsiveness for CAD / Ghost Elements */
+@media (max-width: 768px) {
+    .cad-crosshair-x, .cad-crosshair-y, .cad-coords, .ghost-peer-cursor {
+        display: none !important;
+    }
+    .next-case-architectural {
+        padding: 20px !important;
+        flex-direction: column !important;
+        align-items: flex-start !important;
+    }
+}
